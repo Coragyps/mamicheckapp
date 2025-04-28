@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "521789019957",
+    "firebase_url": "https://mamicheckapi-default-rtdb.firebaseio.com",
+    "project_id": "mamicheckapi",
+    "storage_bucket": "mamicheckapi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521789019957:android:1f3b3a17a5cdeaefa6de7c",
+        "android_client_info": {
+          "package_name": "com.example.mamicheckapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ6AV0ZtruBzTJD0eeHT5QDNJaIsjhZIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
