@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/routes.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'MamiCheck',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: AppRouting.initialRoute,

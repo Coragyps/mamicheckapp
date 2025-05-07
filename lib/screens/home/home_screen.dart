@@ -39,13 +39,17 @@ class _HomeScreenState extends State<HomeScreen> {
       title: Text('MamiCheck'),
       actions: [
         IconButton(
-          onPressed: () {}, 
-          icon: const Icon(Icons.notifications)
+          onPressed: () {
+            Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'notificaciones'));
+          }, 
+          icon: const Icon(Icons.notifications_outlined)
         ),
         Padding(
           padding: const EdgeInsets.only(right: 12),
           child: GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '??'));
+            },
             child: CircleAvatar(
               child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase() : '??'),
             )
@@ -68,27 +72,42 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase() : '??'),
             ),
           ),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.medical_services),
             title: Text('Mis Mediciones'),
+            onTap: () {
+              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Mediciones'));
+            },
           ),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.medical_services),
-            title: Text('Mis Mediciones'),
+            title: Text('Lista de Embarazos'),
+            onTap: () {
+              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Embarazos'));
+            },
           ),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.help),
             title: Text('Ayuda'),
+            onTap: () {
+              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Ayuda'));
+            },
           ),
           const Divider(),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.local_fire_department),
-            title: Text('Probar API'),
+            title: Text('Prueba de API ML'),
+            onTap: () {
+              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'API ML'));
+            },
           ),
           const Divider(),
-          const ListTile(
+          ListTile(
             leading: Icon(Icons.settings),
-            title: Text('Configuración'),
+            title: Text('Configuración y Alertas'),
+            onTap: () {
+              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Configuración'));
+            },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
