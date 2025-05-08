@@ -16,6 +16,10 @@ class AppRouting {
     });
 
     appRoute.addAll({
+      "APITest":(BuildContext context) => ApiTest() 
+    });
+
+    appRoute.addAll({
       "LoginScreen":(BuildContext context) => LoginScreen() 
     });
 
@@ -25,6 +29,30 @@ class AppRouting {
 
     appRoute.addAll({
       "HomeScreen":(BuildContext context) => HomeScreen() 
+    });
+
+    appRoute.addAll({
+      "AddScreen":(BuildContext context) => AddScreen() 
+    });
+
+    appRoute.addAll({
+      "MeasurementScreen":(BuildContext context) => MeasurementScreen() 
+    });
+
+    appRoute.addAll({
+      "NotificationScreen":(BuildContext context) => NotificationScreen() 
+    });
+
+    appRoute.addAll({
+      "PregnancyScreen":(BuildContext context) => PregnancyScreen() 
+    });
+
+    appRoute.addAll({
+      "ProfileScreen":(BuildContext context) => ProfileScreen() 
+    });
+
+    appRoute.addAll({
+      "SettingsScreen":(BuildContext context) => SettingsScreen() 
     });
 
     return appRoute;

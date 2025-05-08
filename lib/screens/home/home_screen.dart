@@ -16,10 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final firebaseuser = FirebaseAuth.instance.currentUser;
 
   final List<List<dynamic>> _pages = [
-    [NotificacionesPage(), 'Inicio', Icon(Icons.home_outlined), Icon(Icons.home)],
-    [ListView.builder(itemCount: 30,itemBuilder: (_, i) => ListTile(title: Text('Item $i')),), 'Historial', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
-    [FeedScreen(), 'Contacto', Icon(Icons.groups_outlined), Icon(Icons.groups)],
-    //[Placeholder(), 'Notificaciones', Icon(Icons.settings)],
+    [FeedScreen(), 'Inicio', Icon(Icons.home_outlined), Icon(Icons.home)],
+    [TrackingScreen(), 'Historial', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
+    [ContactScreen(), 'Contacto', Icon(Icons.groups_outlined), Icon(Icons.groups)],
   ];
 
   @override
@@ -40,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       actions: [
         IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'notificaciones'));
+            Navigator.pushNamed(context, 'NotificationScreen');
           }, 
           icon: const Icon(Icons.notifications_outlined)
         ),
@@ -48,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(right: 12),
           child: GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '??'));
+              Navigator.pushNamed(context, 'ProfileScreen');
             },
             child: CircleAvatar(
               child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase() : '??'),
@@ -76,14 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: Icon(Icons.medical_services),
             title: Text('Mis Mediciones'),
             onTap: () {
-              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Mediciones'));
+              Navigator.pushNamed(context, 'MeasurementScreen');
             },
           ),
           ListTile(
             leading: Icon(Icons.medical_services),
             title: Text('Lista de Embarazos'),
             onTap: () {
-              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Embarazos'));
+              Navigator.pushNamed(context, 'PregnancyScreen');
             },
           ),
           ListTile(
@@ -98,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: Icon(Icons.local_fire_department),
             title: Text('Prueba de API ML'),
             onTap: () {
-              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'API ML'));
+              Navigator.pushNamed(context, 'APITest');
             },
           ),
           const Divider(),
@@ -106,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: Icon(Icons.settings),
             title: Text('Configuración y Alertas'),
             onTap: () {
-              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Configuración'));
+              Navigator.pushNamed(context, 'SettingsScreen');
             },
           ),
           ListTile(
@@ -142,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _add(BuildContext context) {
     return FloatingActionButton(
       onPressed: () {
-        Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'fab button'));
+        Navigator.pushNamed(context, 'AddScreen');
       },
       child: const Icon(Icons.add),
     );

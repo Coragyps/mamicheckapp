@@ -5,46 +5,6 @@ class FeedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Hello👋'),
-    );
-  }
-}
-
-class TrackingScreen extends StatelessWidget {
-  const TrackingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 3,
-      child: Column(
-        children: [
-          const TabBar(
-            tabs: [
-              Tab(text: 'Alertas'),
-              Tab(text: 'Invitaciones'),
-              Tab(text: 'Opiniones'),
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                Placeholder(),
-                Placeholder(),
-                Placeholder(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class NotificacionesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Column(
@@ -58,12 +18,25 @@ class NotificacionesPage extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                Placeholder(),
-                ListView.builder(itemCount: 30,itemBuilder: (_, i) => ListTile(title: Text('Item $i')),),
+                _personal(context),
+                _seguidos(context),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _personal(BuildContext context) {
+    return Placeholder();
+  }
+
+  Widget _seguidos(BuildContext context) {
+    return ListView.builder(
+      itemCount: 30,
+      itemBuilder: (_, i) => ListTile(
+        title: Text('Item $i'),
       ),
     );
   }
