@@ -40,7 +40,15 @@ class _LoginScreenState extends State<LoginScreen> {
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text('Mi Historial:', style: TextStyle(
+                  fontFamily: 'Caveat',
+                  fontSize: 42,
+                )),
+                //const SizedBox(height: 16),
+                Text('Quisit odio, at nobis minima, ullam. Minimaquos, cumque aut velit sunt, animi! Nihiliure, hic tempora amet dolores libero. Hicneque tempora sit, quam eos odit! Laborumanimi, quo, tempora ad tempora animi! Nesciuntsed unde alias unde sit, ad. Aliasdolores rem, in rem, ipsum sed. Temporasunt eveniet nobis amet ullam in. Modiad ullam, vero et amet ut? Sintvitae in, nesciunt, quis nihil eos! '),
+                const SizedBox(height: 46),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,

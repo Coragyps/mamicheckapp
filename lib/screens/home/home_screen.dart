@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:mamicheckapp/screens/screens.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,7 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.red, // Placeholder: cuadrado rojo
           ),
           const SizedBox(width: 8),
-          Text('Mamicheck', style: GoogleFonts.caveat(),),
+          Text('Mamicheck', style: TextStyle(
+            fontFamily: 'Caveat',
+          )),
         ],
       ),
       actions: [
