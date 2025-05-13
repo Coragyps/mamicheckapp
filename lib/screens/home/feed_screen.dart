@@ -11,7 +11,7 @@ class FeedScreen extends StatelessWidget {
         children: [
           const TabBar(
             tabs: [
-              Tab(text: 'Personal'),
+              Tab(text: 'Mios'),
               Tab(text: 'Seguidos'),
             ],
           ),

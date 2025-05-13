@@ -16,16 +16,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final firebaseuser = FirebaseAuth.instance.currentUser;
 
   final List<List<dynamic>> _pages = [
-    [FeedScreen(), 'Inicio', Icon(Icons.home_outlined), Icon(Icons.home)],
-    [TrackingScreen(), 'Historial', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
-    [ContactScreen(), 'Contacto', Icon(Icons.groups_outlined), Icon(Icons.groups)],
+    [FeedScreen(), 'Embarazos', Icon(Icons.home_outlined), Icon(Icons.home)],
+    [TrackingScreen(), 'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
+    [ContactScreen(), 'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups)],
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _titlebar(context, firebaseuser),
-      drawer: _menu(context, firebaseuser),
       body: _body(context),
       bottomNavigationBar: _navbar(context),
       floatingActionButton: _add(context),
@@ -34,10 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
     return AppBar(
-      //title: Text(_pages[_selectedIndex][1] as String),
-      title: Text('MamiCheck'),
+      title: const Text('MamiCheck'),
       actions: [
         IconButton(
+          tooltip: 'Notificaciones',
           onPressed: () {
             Navigator.pushNamed(context, 'NotificationScreen');
           }, 
@@ -45,79 +44,90 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(right: 12),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, 'ProfileScreen');
+          child: PopupMenuButton<String>(
+            tooltip: 'Menu de Opciones',
+            onSelected: (String value) {
+              switch (value) {
+                case 'profile':
+                  Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: value));
+                  break;
+                case 'config':
+                  Navigator.pushNamed(context, 'SettingsScreen');
+                  break;
+                case 'api':
+                  Navigator.pushNamed(context, 'APITest');
+                  break;
+                case 'measurements':
+                  Navigator.pushNamed(context, 'MeasurementScreen');
+                  break;
+                case 'pregnancies':
+                  Navigator.pushNamed(context, 'PregnancyScreen');
+                  break;
+                case 'help':
+                  Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: value));
+                  break;
+                case 'signout':
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('¿Cerrar sesión?'),
+                        content: Text('Se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.'),
+                        actions: [
+                          TextButton(
+                            child: Text('Cancelar'),
+                            onPressed: () {Navigator.of(context).pop();},
+                          ),
+                          TextButton(
+                            child: Text('OK'),
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              await AuthService().signout();
+                              Navigator.pushNamedAndRemoveUntil(context, 'LoginScreen', (_) => false);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  break;
+                default:
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('¡Acción "$value" no existe!'), behavior: SnackBarBehavior.floating,),
+                  );
+              }
             },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(value: 'profile', child: Row(
+                children: [Icon(Icons.person_outline), SizedBox(width: 8,), Text('Mi Perfil')],
+              )),
+              const PopupMenuItem<String>(value: 'config', child: Row(
+                children: [Icon(Icons.settings_outlined), SizedBox(width: 8,), Text('Configuración')],
+              )),
+              const PopupMenuDivider(),
+              const PopupMenuItem<String>(value: 'api', child: Row(
+                children: [SizedBox(width: 8,), Text('Prueba de API ML')],
+              )),
+              const PopupMenuItem<String>(value: 'measurements', child: Row(
+                children: [Icon(Icons.monitor_heart_outlined), SizedBox(width: 8,), Text('Todas las Mediciones')],
+              )),
+              const PopupMenuItem<String>(value: 'pregnancies', child: Row(
+                children: [Icon(Icons.monitor_heart_outlined), SizedBox(width: 8,), Text('Todos los Embarazos')],
+              )),
+              const PopupMenuDivider(),
+              const PopupMenuItem<String>(value: 'help', child: Row(
+                children: [Icon(Icons.help_outline), SizedBox(width: 8,), Text('Ayuda')],
+              )),
+              const PopupMenuItem<String>(value: 'signout', child: Row(
+                children: [Icon(Icons.logout), SizedBox(width: 8,), Text('Cerrar Sesión')],
+              )),
+            ],
             child: CircleAvatar(
-              child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase() : '??'),
-            )
+              child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase()+firebaseuser.email.toString()[1] : '??'),
+            ),
           ),
         )
       ],
-    );
-  }
-
-  Widget _menu(BuildContext context, firebaseuser) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          UserAccountsDrawerHeader(
-            accountName: Text(firebaseuser.email.toString()),
-            accountEmail: Text(firebaseuser.email.toString()),
-            currentAccountPicture: CircleAvatar(
-              //backgroundImage: AssetImage('assets/profile.jpg'), // Usa NetworkImage si es online
-              child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase() : '??'),
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.medical_services),
-            title: Text('Mis Mediciones'),
-            onTap: () {
-              Navigator.pushNamed(context, 'MeasurementScreen');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.medical_services),
-            title: Text('Lista de Embarazos'),
-            onTap: () {
-              Navigator.pushNamed(context, 'PregnancyScreen');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.help),
-            title: Text('Ayuda'),
-            onTap: () {
-              Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: 'Ayuda'));
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: Icon(Icons.local_fire_department),
-            title: Text('Prueba de API ML'),
-            onTap: () {
-              Navigator.pushNamed(context, 'APITest');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Configuración y Alertas'),
-            onTap: () {
-              Navigator.pushNamed(context, 'SettingsScreen');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app),
-            title: Text('Cerrar Sesión'),
-            onTap: () async {
-              await AuthService().signout();
-              Navigator.pushNamedAndRemoveUntil(context, 'LoginScreen', (Route<dynamic> route) => false);
-            } 
-          ),
-        ],
-      ),
     );
   }
 
