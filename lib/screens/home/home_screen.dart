@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:mamicheckapp/screens/screens.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +24,11 @@ class _HomeScreenState extends State<HomeScreen> {
     [ContactScreen(), 'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups)],
   ];
 
+  MaterialColor _profileColor(String email) {
+    final hash = email.hashCode;
+    return Colors.primaries[hash.abs() % Colors.primaries.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,8 +40,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
+    final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase()+firebaseuser.email.toString()[1] : '??';
+    final baseColor = _profileColor(email);
+
     return AppBar(
-      title: const Text('Mamicheck'),
+      title: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            color: Colors.red, // Placeholder: cuadrado rojo
+          ),
+          const SizedBox(width: 8),
+          Text('Mamicheck', style: GoogleFonts.caveat(),),
+        ],
+      ),
       actions: [
         IconButton(
           tooltip: 'Notificaciones',
@@ -45,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.only(right: 12),
           child: PopupMenuButton<String>(
-            tooltip: 'Menu de Opciones',
+            tooltip: 'Menú de Opciones',
             onSelected: (String value) {
               switch (value) {
                 case 'profile':
@@ -123,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
             ],
             child: CircleAvatar(
-              child: Text(firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase()+firebaseuser.email.toString()[1] : '??'),
+              backgroundColor: baseColor.shade900,
+              child: Text(email, style: TextStyle(color: baseColor.shade100),),
             ),
           ),
         )
