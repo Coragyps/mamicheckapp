@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
     return AppBar(
-      title: const Text('MamiCheck'),
+      title: const Text('Mamicheck'),
       actions: [
         IconButton(
           tooltip: 'Notificaciones',
@@ -71,15 +71,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('¿Cerrar sesión?'),
-                        content: Text('Se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.'),
+                        title: const Text('¿Deseas cerrar sesión?'),
+                        content: const Text('Si continuas, se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.\n\nTendrás que volver a acceder para usar el resto de funciones.'),
                         actions: [
-                          TextButton(
-                            child: Text('Cancelar'),
+                          ElevatedButton(
+                            child: const Text('No, Gracias'),
                             onPressed: () {Navigator.of(context).pop();},
                           ),
                           TextButton(
-                            child: Text('OK'),
+                            child: const Text('Acepto'),
                             onPressed: () async {
                               Navigator.of(context).pop();
                               await AuthService().signout();
