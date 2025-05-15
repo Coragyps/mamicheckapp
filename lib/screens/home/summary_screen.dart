@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class FeedScreen extends StatelessWidget {
-  const FeedScreen({super.key});
+class SummaryScreen extends StatelessWidget {
+  const SummaryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +11,8 @@ class FeedScreen extends StatelessWidget {
         children: [
           const TabBar(
             tabs: [
-              Tab(text: 'Mios'),
-              Tab(text: 'Seguidos'),
+              Tab(text: 'Mi Embarazo'),
+              Tab(text: 'Siguiendo'),
             ],
           ),
           Expanded(

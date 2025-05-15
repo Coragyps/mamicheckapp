@@ -11,19 +11,18 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
   int _selectedIndex = 0;
   final firebaseuser = FirebaseAuth.instance.currentUser;
 
   final List<List<dynamic>> _pages = [
-    [FeedScreen(), 'Embarazos', Icon(Icons.home_outlined), Icon(Icons.home)],
-    [TrackingScreen(), 'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
-    [ContactScreen(), 'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups)],
+    [SummaryScreen(),'Resumen', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services)],
+    [EvolutionScreen(),'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
+    [AccompanyScreen(),'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups)],
   ];
 
   MaterialColor _profileColor(String email) {
-    final hash = email.hashCode;
-    return Colors.primaries[hash.abs() % Colors.primaries.length];
+    return Colors.primaries[email.hashCode.abs() % Colors.primaries.length];
   }
 
   @override
@@ -32,15 +31,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: _titlebar(context, firebaseuser),
       body: _body(context),
       bottomNavigationBar: _navbar(context),
-      floatingActionButton: _add(context),
+      floatingActionButton: _fab(context),
     );
   }
 
   PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
-    final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString()[0].toUpperCase()+firebaseuser.email.toString()[1] : '??';
+    final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '???';
     final baseColor = _profileColor(email);
 
     return AppBar(
+      forceMaterialTransparency: true,
       title: Row(
         children: [
           Container(
@@ -49,9 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.red, // Placeholder: cuadrado rojo
           ),
           const SizedBox(width: 8),
-          Text('Mamicheck', style: TextStyle(
-            fontFamily: 'Caveat',
-          )),
+          Text('Mamicheck', style: TextStyle(fontFamily: 'Caveat',)),
         ],
       ),
       actions: [
@@ -69,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onSelected: (String value) {
               switch (value) {
                 case 'profile':
-                  Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: value));
+                  Navigator.pushNamed(context, 'ProfileScreen');
                   break;
                 case 'config':
                   Navigator.pushNamed(context, 'SettingsScreen');
@@ -144,13 +142,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
             child: CircleAvatar(
               backgroundColor: baseColor.shade900,
-              child: Text(email, style: TextStyle(color: baseColor.shade100),),
+              child: Text(email[0].toUpperCase() + email[1].toUpperCase(), style: TextStyle(color: baseColor.shade100),),
             ),
           ),
         )
       ],
     );
   }
+
 
   Widget _body(BuildContext context) {
     return IndexedStack(
@@ -159,20 +158,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   } 
 
+
   Widget _navbar(BuildContext context) {
     return NavigationBar(
       selectedIndex: _selectedIndex,
       onDestinationSelected: (index) {
-        if (_selectedIndex != index) {setState(() => _selectedIndex = index);}
+        if (_selectedIndex != index) {
+          setState(() => _selectedIndex = index);
+        }
       },
       destinations: _pages.map((item) => NavigationDestination(icon: item[2], selectedIcon: item[3], label: item[1])).toList(),
     );
   }
 
-  Widget _add(BuildContext context) {
+  Widget _fab(BuildContext context) {
     return FloatingActionButton(
       onPressed: () {
-        Navigator.pushNamed(context, 'AddScreen');
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
+          builder: (context) {
+            return DraggableScrollableSheet(
+              expand: false,
+              maxChildSize: 0.9,
+              builder: (context, scrollController) {
+                return MeasurementSheet(scrollController: scrollController);
+              },
+            );
+          }
+        );
       },
       child: const Icon(Icons.add),
     );

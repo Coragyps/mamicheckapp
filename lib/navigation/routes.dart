@@ -8,18 +8,6 @@ class AppRouting {
     Map<String, Widget Function(BuildContext)> appRoute = {};
 
     appRoute.addAll({
-      "MyHomePage": (BuildContext context) {
-        final args = ModalRoute.of(context)!.settings.arguments as MyHomePageArguments;
-        //final args = MyHomePageArguments(title: 'Flutter Demo Home Page');
-        return MyHomePage(title: args.title);
-      }
-    });
-
-    appRoute.addAll({
-      "APITest":(BuildContext context) => ApiTest() 
-    });
-
-    appRoute.addAll({
       "LoginScreen":(BuildContext context) => LoginScreen() 
     });
 
@@ -28,23 +16,27 @@ class AppRouting {
     });
 
     appRoute.addAll({
+      "MeasurementsScreen":(BuildContext context) => MeasurementsScreen() 
+    });
+
+    appRoute.addAll({
+      "APITest":(BuildContext context) => ApiTest() 
+    });
+
+    appRoute.addAll({
+      "MyHomePage": (BuildContext context) {
+        final args = ModalRoute.of(context)!.settings.arguments as MyHomePageArguments;
+        //final args = MyHomePageArguments(title: 'Flutter Demo Home Page');
+        return MyHomePage(title: args.title);
+      }
+    });
+
+    appRoute.addAll({
       "HomeScreen":(BuildContext context) => HomeScreen() 
     });
 
     appRoute.addAll({
-      "AddScreen":(BuildContext context) => AddScreen() 
-    });
-
-    appRoute.addAll({
-      "MeasurementScreen":(BuildContext context) => MeasurementScreen() 
-    });
-
-    appRoute.addAll({
       "NotificationScreen":(BuildContext context) => NotificationScreen() 
-    });
-
-    appRoute.addAll({
-      "PregnancyScreen":(BuildContext context) => PregnancyScreen() 
     });
 
     appRoute.addAll({
