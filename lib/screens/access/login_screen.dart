@@ -93,13 +93,25 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushReplacementNamed(context, "HomeScreen");
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(error), behavior: SnackBarBehavior.floating),
+                          SnackBar(content: Text(error)),
                         );
                       }
                     }
                   },
                   child: const Text("Sign In"),
                 ),
+
+                const SizedBox(height: 12),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, "HomeScreen");
+                  },
+                  child: const Text(
+                    "Ingresar sin registrarse (debug)",
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
+                )
               ],
             ),
           ),

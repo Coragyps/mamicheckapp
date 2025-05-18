@@ -14,6 +14,7 @@ export 'package:mamicheckapp/screens/home/summary_screen.dart';
 export 'package:mamicheckapp/screens/home/home_screen.dart';
 export 'package:mamicheckapp/screens/home/evolution_screen.dart';
 
+export 'package:mamicheckapp/screens/menu/help_screen.dart';
 export 'package:mamicheckapp/screens/menu/notification_screen.dart';
 export 'package:mamicheckapp/screens/menu/profile_screen.dart';
 export 'package:mamicheckapp/screens/menu/settings_screen.dart';

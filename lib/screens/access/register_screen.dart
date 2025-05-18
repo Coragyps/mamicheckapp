@@ -142,7 +142,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Navigator.pushNamedAndRemoveUntil(context, 'HomeScreen', (Route<dynamic> route) => false);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(error), behavior: SnackBarBehavior.floating),
+                          SnackBar(content: Text(error)),
                         );
                       }
                     }

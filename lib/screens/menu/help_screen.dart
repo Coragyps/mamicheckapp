@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class MeasurementsScreen extends StatelessWidget {
-  const MeasurementsScreen({super.key});
+class HelpScreen extends StatelessWidget {
+  const HelpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('todas las mediciones'),
+        title: Text('help'),
       ),
     );
   }

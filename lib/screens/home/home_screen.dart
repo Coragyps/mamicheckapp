@@ -1,12 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:mamicheckapp/screens/screens.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
+  
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -14,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
   int _selectedIndex = 0;
   final firebaseuser = FirebaseAuth.instance.currentUser;
+  
 
   final List<List<dynamic>> _pages = [
     [SummaryScreen(),'Resumen', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services)],
@@ -36,7 +36,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
-    final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '???';
+    //final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '???';
+    final email = firebaseuser?.email ?? '???';
     final baseColor = _profileColor(email);
 
     return AppBar(
@@ -76,13 +77,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   Navigator.pushNamed(context, 'APITest');
                   break;
                 case 'measurements':
-                  Navigator.pushNamed(context, 'MeasurementScreen');
-                  break;
-                case 'pregnancies':
-                  Navigator.pushNamed(context, 'PregnancyScreen');
+                  Navigator.pushNamed(context, 'MeasurementsScreen');
                   break;
                 case 'help':
-                  Navigator.pushNamed(context, 'MyHomePage', arguments: MyHomePageArguments(title: value));
+                  Navigator.pushNamed(context, 'HelpScreen');
                   break;
                 case 'signout':
                   showDialog(
@@ -111,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   break;
                 default:
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('¡Acción "$value" no existe!'), behavior: SnackBarBehavior.floating,),
+                    SnackBar(content: Text('¡Acción "$value" no existe!')),
                   );
               }
             },
@@ -128,9 +126,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               )),
               const PopupMenuItem<String>(value: 'measurements', child: Row(
                 children: [Icon(Icons.monitor_heart_outlined), SizedBox(width: 8,), Text('Todas las Mediciones')],
-              )),
-              const PopupMenuItem<String>(value: 'pregnancies', child: Row(
-                children: [Icon(Icons.monitor_heart_outlined), SizedBox(width: 8,), Text('Todos los Embarazos')],
               )),
               const PopupMenuDivider(),
               const PopupMenuItem<String>(value: 'help', child: Row(
@@ -181,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           builder: (context) {
             return DraggableScrollableSheet(
               expand: false,
-              maxChildSize: 0.9,
+                maxChildSize: 0.9, // Esto da un valor entre 0 y 1
               builder: (context, scrollController) {
                 return MeasurementSheet(scrollController: scrollController);
               },

@@ -36,6 +36,10 @@ class AppRouting {
     });
 
     appRoute.addAll({
+      "HelpScreen":(BuildContext context) => HelpScreen() 
+    });
+
+    appRoute.addAll({
       "NotificationScreen":(BuildContext context) => NotificationScreen() 
     });
 
