@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mamicheckapp/screens/access/auth_screen.dart';
 import 'firebase_options.dart';
 
 void main() async{
@@ -9,23 +11,29 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  final user = FirebaseAuth.instance.currentUser;
+  final initialRoute = user == null ? 'LoginScreen' : 'HomeScreen';
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
 
-  // This widget is the root of your application.
+  const MyApp({super.key, required this.initialRoute});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MamiCheck',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffCA3E7F)),
       ),
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRouting.initialRoute,
+      debugShowCheckedModeBanner: true,
+      //initialRoute: AppRouting.initialRoute,
+      //home: const AuthScreen(),
+      initialRoute: initialRoute,
       routes: AppRouting.getRoutes(),
     );
   }
