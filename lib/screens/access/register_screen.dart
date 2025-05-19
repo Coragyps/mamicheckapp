@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mamicheckapp/models/user_model.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:mamicheckapp/services/user_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _lastNameController = TextEditingController();
   final _birthDateController = TextEditingController();
 
+  DateTime? _selectedBirthDate;
   bool _obscurePassword = true;
 
   @override
@@ -69,19 +73,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _birthDateController,
-                  decoration: const InputDecoration(
-                    filled: true,
-                    labelText: 'Birth Date',
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
+                  decoration: const InputDecoration(filled: true, labelText: 'Birth Date', suffixIcon: Icon(Icons.calendar_today)),
                   readOnly: true,
                   onTap: () async {
                     final initial = DateTime(2000);
                     final firstDate = DateTime(1900);
-                    final lastDate = DateTime(2024);
-
+                    final lastDate = DateTime(2020);
                     final pickedDate = await showDatePicker(
-                      context: context,
+                      context: context, 
                       initialDate: initial,
                       firstDate: firstDate,
                       lastDate: lastDate,
@@ -91,7 +90,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     );
                     if (pickedDate != null) {
                       setState(() {
-                        _birthDateController.text = "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
+                        _selectedBirthDate = pickedDate;
+                        _birthDateController.text = 
+                          "${pickedDate.day.toString().padLeft(2, '0')}/"
+                          "${pickedDate.month.toString().padLeft(2, '0')}/"
+                          "${pickedDate.year}";
                       });
                     }
                   },
@@ -139,6 +142,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
                       if (!mounted) return;
                       if (error == null) {
+                        final user = FirebaseAuth.instance.currentUser;
+                        /*if (user != null) {
+                          await UserService().createUserDocument(
+                            uid: user.uid, 
+                            email: _emailController.text.trim(), 
+                            firstName: _firstNameController.text.trim(), 
+                            lastName: _lastNameController.text.trim(), 
+                            birthDate: _selectedBirthDate!,
+                          );
+                        }*/
+                        if (user != null) {
+                          final newUser = UserModel(
+                            uid: user.uid,
+                            email: _emailController.text.trim(),
+                            firstName: _firstNameController.text.trim(),
+                            lastName: _lastNameController.text.trim(),
+                            birthDate: _selectedBirthDate!,
+                            isPregnant: false,
+                          );
+                          await UserService().createUserDocument(newUser);
+                        }
                         Navigator.pushNamedAndRemoveUntil(context, 'HomeScreen', (Route<dynamic> route) => false);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -157,7 +181,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-    Widget _signmethod(BuildContext context) {
+  Widget _signmethod(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: RichText(
