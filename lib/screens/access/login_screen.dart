@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
 
@@ -27,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(),
       body: _body(context),
-      bottomNavigationBar: _signmethod(context),
+      bottomNavigationBar: _navbar(context),
     );
   }
 
@@ -53,19 +52,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
-                    filled: true,
-                    labelText: "Email",
+                    border: OutlineInputBorder(),
+                    labelText: "Correo Electronico",
                   ),
                   validator: (value) =>
-                      value == null || value.isEmpty ? 'Email is Required' : null,
+                      value == null || value.isEmpty ? 'El correo no puede estar en blanco' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    filled: true,
-                    labelText: "Password",
+                    border: OutlineInputBorder(),
+                    labelText: "Contraseña",
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -78,27 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   validator: (value) =>
-                      value == null || value.isEmpty ? 'Password is Required' : null,
+                      value == null || value.isEmpty ? 'La contraseña no puede estar en blanco' : null,
                 ),
                 const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final error = await AuthService().signin(
-                        email: _emailController.text.trim(),
-                        password: _passwordController.text.trim(),
-                      );
-                      if (!mounted) return;
-                      if (error == null) {
-                        Navigator.pushReplacementNamed(context, "HomeScreen");
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(error)),
-                        );
-                      }
-                    }
-                  },
-                  child: const Text("Sign In"),
+                FilledButton(
+                  onPressed: () => _handleSignin(context),
+                  child: const Text("Ingresar"),
                 ),
 
                 const SizedBox(height: 12),
@@ -120,30 +104,43 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _signmethod(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: RichText(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-          text: "New user? ",
-          style: Theme.of(context).textTheme.bodyMedium,
+  Widget _navbar(BuildContext context) {
+    return BottomAppBar(
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            TextSpan(
-              text: "Create Account",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-              recognizer: TapGestureRecognizer()
-              ..onTap = () {
+            Text('¿Aun no tienes una cuenta?',),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.account_circle),
+              onPressed: () {
                 _formKey.currentState?.reset();
-                Navigator.pushNamed(context, "RegisterScreen");
-              }
-            ),
+                Navigator.pushNamed(context, 'RegisterDialog');
+              },
+              label: const Text('Registrarse'),
+            )
           ],
         ),
-      ),
     );
+  }
+
+  Future <void> _handleSignin(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      final messenger = ScaffoldMessenger.of(context);
+      final navigator = Navigator.of(context);
+
+      final error = await AuthService().signin(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      
+      if (error == null) {
+        // navigator.pushNamedAndRemoveUntil('HomeScreen', (_) => false);
+        navigator.pushReplacementNamed('HomeScreen');
+      } else {
+        messenger.showSnackBar(
+          SnackBar(content: Text(error))
+        );
+      }
+    }
   }
 }

@@ -10,6 +10,11 @@ class NotificationScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('notify'),
       ),
+      body: Center(
+        child: Image(
+          image: AssetImage('assets/img/logo.png'),
+        ),
+      ),
     );
   }
 }

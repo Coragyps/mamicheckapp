@@ -13,12 +13,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
   int _selectedIndex = 0;
   final firebaseuser = FirebaseAuth.instance.currentUser;
-  
 
   final List<List<dynamic>> _pages = [
-    [SummaryScreen(),'Resumen', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services)],
-    [EvolutionScreen(),'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics)],
-    [AccompanyScreen(),'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups)],
+    [SummaryScreen(),'Seguimiento', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services), 'Seguimiento'],
+    [EvolutionScreen(),'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics), 'Mi Evolución'],
+    [AccompanyScreen(),'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups), 'Acompañar'],
   ];
 
   MaterialColor _profileColor(String email) {
@@ -41,18 +40,22 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final baseColor = _profileColor(email);
 
     return AppBar(
+      //backgroundColor: Colors.green,
       forceMaterialTransparency: true,
-      title: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            color: Colors.red, // Placeholder: cuadrado rojo
-          ),
-          const SizedBox(width: 8),
-          Text('Mamicheck', style: TextStyle(fontFamily: 'Caveat',)),
-        ],
-      ),
+
+      // title: Row(
+      //   children: [
+      //     Image(
+      //        image: AssetImage('assets/img/logo.png'),
+      //        width: 32,
+      //     ),
+      //     Text('Mamicheck', 
+      //     style: TextStyle(fontFamily: 'Caveat', fontSize: 22, color: Color(0xffCA3E7F))
+      //     //style: Theme.of(context).textTheme.headlineMedium!.copyWith(fontFamily: 'Caveat'),
+      //     ),
+      //   ],
+      // ),
+      title: Text(_pages[_selectedIndex][4], style: TextStyle(fontFamily: 'Caveat', fontSize: 42)),
       actions: [
         IconButton(
           tooltip: 'Notificaciones',
@@ -66,6 +69,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           child: PopupMenuButton<String>(
             tooltip: 'Menú de Opciones',
             onSelected: (String value) {
+              final messenger = ScaffoldMessenger.of(context);
+              final navigator = Navigator.of(context, rootNavigator: true);
+
               switch (value) {
                 case 'profile':
                   Navigator.pushNamed(context, 'ProfileScreen');
@@ -85,31 +91,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 case 'signout':
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) {
+                    builder: (BuildContext dialogContext) {
+                      final dialognavigator = Navigator.of(dialogContext);
                       return AlertDialog(
                         title: const Text('¿Deseas cerrar sesión?'),
                         content: const Text('Si continuas, se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.\n\nTendrás que volver a acceder para usar el resto de funciones.'),
                         actions: [
                           ElevatedButton(
                             child: const Text('No, Gracias'),
-                            onPressed: () {Navigator.of(context).pop();},
+                            onPressed: () {
+                              dialognavigator.pop(false);
+                            },
                           ),
                           TextButton(
                             child: const Text('Acepto'),
                             onPressed: () async {
-                              Navigator.of(context).pop();
                               await AuthService().signout();
-                              Navigator.pushNamedAndRemoveUntil(context, 'LoginScreen', (_) => false);
+                              dialognavigator.pop(false);
+                              navigator.pushReplacementNamed('LoginScreen');
                             },
-                          ),
-                        ],
+                          )
+                        ], 
                       );
-                    },
+                    }
                   );
-                  break;
+                  break;                
                 default:
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('¡Acción "$value" no existe!')),
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('¡Acción "$value" no existe!'))
                   );
               }
             },

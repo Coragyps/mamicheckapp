@@ -1,5 +1,5 @@
 export 'package:mamicheckapp/screens/access/login_screen.dart';
-export 'package:mamicheckapp/screens/access/register_screen.dart';
+export 'package:mamicheckapp/screens/access/register_dialog.dart';
 
 export 'package:mamicheckapp/screens/collection/measurements_screen.dart';
 
