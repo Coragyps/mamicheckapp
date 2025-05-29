@@ -89,10 +89,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, "HomeScreen");
+                    _emailController.text = 'mamicheckroot@gmail.com';
+                    _passwordController.text = '123456';
+                    _handleSignin(context);
                   },
                   child: const Text(
-                    "Ingresar sin registrarse (debug)",
+                    "mamicheckroot (debug)",
                     style: TextStyle(color: Colors.redAccent),
                   ),
                 )
@@ -126,20 +128,22 @@ class _LoginScreenState extends State<LoginScreen> {
   Future <void> _handleSignin(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       final messenger = ScaffoldMessenger.of(context);
-      final navigator = Navigator.of(context);
 
       final error = await AuthService().signin(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
       
-      if (error == null) {
-        // navigator.pushNamedAndRemoveUntil('HomeScreen', (_) => false);
-        navigator.pushReplacementNamed('HomeScreen');
-      } else {
-        messenger.showSnackBar(
-          SnackBar(content: Text(error))
-        );
+      // if (error == null) {
+      //   // navigator.pushNamedAndRemoveUntil('HomeScreen', (_) => false);
+      //   navigator.pushReplacementNamed('HomeScreen');
+      // } else {
+      //   messenger.showSnackBar(
+      //     SnackBar(content: Text(error))
+      //   );
+      // }
+      if (error != null) {
+        messenger.showSnackBar(SnackBar(content: Text(error)));
       }
     }
   }

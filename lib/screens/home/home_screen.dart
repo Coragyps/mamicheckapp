@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mamicheckapp/screens/home/avatar.dart';
 import 'package:mamicheckapp/screens/screens.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,24 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
     [AccompanyScreen(),'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups), 'Acompañar'],
   ];
 
-  MaterialColor _profileColor(String email) {
-    return Colors.primaries[email.hashCode.abs() % Colors.primaries.length];
-  }
-
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+
     return Scaffold(
-      appBar: _titlebar(context, firebaseuser),
+      appBar: _titlebar(context, user),
       body: _body(context),
       bottomNavigationBar: _navbar(context),
       floatingActionButton: _fab(context),
     );
   }
 
-  PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
-    //final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '???';
-    final avatar = firebaseuser?.displayName ?? '???';
-    final baseColor = _profileColor(avatar);
+  PreferredSizeWidget _titlebar(BuildContext context, User user) {
 
     return AppBar(
       //backgroundColor: Colors.green,
@@ -70,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: 'Menú de Opciones',
             onSelected: (String value) {
               final messenger = ScaffoldMessenger.of(context);
-              final navigator = Navigator.of(context, rootNavigator: true);
 
               switch (value) {
                 case 'profile':
@@ -100,15 +96,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ElevatedButton(
                             child: const Text('No, Gracias'),
                             onPressed: () {
-                              dialognavigator.pop(false);
+                              dialognavigator.pop();
                             },
                           ),
                           TextButton(
                             child: const Text('Acepto'),
                             onPressed: () async {
                               await AuthService().signout();
-                              dialognavigator.pop(false);
-                              navigator.pushReplacementNamed('LoginScreen');
+                              dialognavigator.pop();
                             },
                           )
                         ], 
@@ -144,10 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [Icon(Icons.logout), SizedBox(width: 8,), Text('Cerrar Sesión')],
               )),
             ],
-            child: CircleAvatar(
-              backgroundColor: baseColor.shade900,
-              child: Text(avatar[0]+avatar[1], style: TextStyle(color: baseColor.shade100))
-            ),
+            child: Avatar(),
           ),
         )
       ],

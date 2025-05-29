@@ -363,7 +363,9 @@ class _RegisterDialogState extends State<RegisterDialog> {
           await UserService().createUserDocument(newUser);
           await user.updateDisplayName('${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}$firstName');
         }
-        navigator.pushNamedAndRemoveUntil('HomeScreen', (_) => false);
+
+        if (navigator.canPop()) {navigator.pop();}
+
       } else {
         messenger.showSnackBar(
           SnackBar(content: Text(error))
