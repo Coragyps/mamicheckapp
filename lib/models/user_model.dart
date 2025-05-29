@@ -6,36 +6,39 @@ class UserModel {
   final String firstName;
   final String lastName;
   final DateTime birthDate;
+  final String telephoneNumber;
   final bool isPregnant;
 
   UserModel({
     required this.uid,
-    this.email = '???',
-    this.firstName = '???',
-    this.lastName = '???',
-    DateTime? birthDate,
-    this.isPregnant = true,
-  }) : birthDate = birthDate ?? DateTime.now();
+    required this.email,
+    required this.firstName,
+    required this.lastName,
+    required this.birthDate,
+    required this.telephoneNumber,
+    required this.isPregnant,
+  });
 
-  factory UserModel.fromJson(Map<String, dynamic> json, String uid) {
+  factory UserModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return UserModel(
-      uid: uid,
-      email: json['email'] ?? '???',
-      firstName: json['firstName'] ?? '???',
-      lastName: json['lastName'] ?? '???',
-      birthDate: json['birthDate'] is Timestamp
-          ? (json['birthDate'] as Timestamp).toDate()
-          : DateTime.now(),
-      isPregnant: json['isPregnant'] ?? true,
+      uid: doc.id,
+      email: data['email'] ?? '???',
+      firstName: data['firstName'] ?? '???',
+      lastName: data['lastName'] ?? '???',
+      birthDate: data['birthDate']?.toDate() ?? DateTime.now(),
+      telephoneNumber: data['telephoneNumber'] ?? '???',
+      isPregnant: data['isPregnant'] ?? true,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'email': email,
       'firstName': firstName,
       'lastName': lastName,
       'birthDate': Timestamp.fromDate(birthDate),
+      'telephoneNumber': telephoneNumber,
       'isPregnant': isPregnant,
     };
   }

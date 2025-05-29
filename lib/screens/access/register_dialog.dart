@@ -18,6 +18,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
   final _passwordController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _telephoneController = TextEditingController();
   final _birthDateController = TextEditingController();
 
   DateTime? _selectedBirthDate;
@@ -29,6 +30,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
     _passwordController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _telephoneController.dispose();
     _birthDateController.dispose();
     super.dispose();
   }
@@ -38,8 +40,6 @@ class _RegisterDialogState extends State<RegisterDialog> {
     return Scaffold(
       appBar: _titlebar(context),
       body: _body(context),
-      //body: Text('aea'),
-      // bottomNavigationBar: _navbar(context),
     );
   }
 
@@ -66,110 +66,274 @@ class _RegisterDialogState extends State<RegisterDialog> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Nombres',
-                ),
-                validator: (value) => value == null || value.isEmpty ? 'Enter your First Name' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Apellidos',
-                ),
-                validator: (value) => value == null || value.isEmpty ? 'Enter your Last Name' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _birthDateController,
-                decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Birth Date', suffixIcon: Icon(Icons.calendar_today)),
-                readOnly: true,
-                onTap: () async {
-                  final initial = DateTime(2000);
-                  final firstDate = DateTime(1900);
-                  final lastDate = DateTime(2020);
-                  final pickedDate = await showDatePicker(
-                    context: context, 
-                    initialDate: initial,
-                    firstDate: firstDate,
-                    lastDate: lastDate,
-                    initialEntryMode: DatePickerEntryMode.calendarOnly,
-                    initialDatePickerMode: DatePickerMode.year,
-                    helpText: 'Fecha de Nacimiento',
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedBirthDate = pickedDate;
-                      _birthDateController.text = 
-                        "${pickedDate.day.toString().padLeft(2, '0')}/"
-                        "${pickedDate.month.toString().padLeft(2, '0')}/"
-                        "${pickedDate.year}";
-                    });
-                  }
-                },
-                validator: (value) => value == null || value.isEmpty ? 'Select Birth Date' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Correo Electronico',
-                ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) => value == null || value.isEmpty ? 'Enter an email' : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Contraseña',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {_obscurePassword = !_obscurePassword;});
-                    },
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.person_outline),
                   ),
-                ),
-                validator: (value) => value != null && value.length < 6
-                    ? 'Password must be at least 6 characters'
-                    : null,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _firstNameController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Nombres',
+                          ),
+                          validator: (value) => value == null || value.isEmpty ? 'Enter your First Name' : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _lastNameController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Apellidos',
+                          ),
+                          validator: (value) => value == null || value.isEmpty ? 'Enter your Last Name' : null,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.cake_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _birthDateController,
+                          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Birth Date', suffixIcon: Icon(Icons.calendar_today)),
+                          readOnly: true,
+                          onTap: () async {
+                            final initial = DateTime(1995);
+                            final firstDate = DateTime(1900);
+                            final lastDate = DateTime(2020);
+                            final pickedDate = await showDatePicker(
+                              context: context, 
+                              initialDate: initial,
+                              firstDate: firstDate,
+                              lastDate: lastDate,
+                              initialEntryMode: DatePickerEntryMode.calendarOnly,
+                              initialDatePickerMode: DatePickerMode.year,
+                              helpText: 'Fecha de Nacimiento',
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                _selectedBirthDate = pickedDate;
+                                _birthDateController.text = 
+                                  "${pickedDate.day.toString().padLeft(2, '0')}/"
+                                  "${pickedDate.month.toString().padLeft(2, '0')}/"
+                                  "${pickedDate.year}";
+                              });
+                            }
+                          },
+                          validator: (value) => value == null || value.isEmpty ? 'Select Birth Date' : null,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.mail_outline),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Correo Electronico',
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) => value == null || value.isEmpty ? 'Enter an email' : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Contraseña',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                setState(() {_obscurePassword = !_obscurePassword;});
+                              },
+                            ),
+                          ),
+                          validator: (value) => value != null && value.length < 6
+                              ? 'Password must be at least 6 characters'
+                              : null,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.phone_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _telephoneController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Número de Celular'
+                          ),
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Ingresa un número telefónico';
+                            }
+                            if (!RegExp(r'^\d{9,15}$').hasMatch(value)) {
+                              return 'Número inválido';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
             ],
+
+            // children: [
+            //   TextFormField(
+            //     controller: _firstNameController,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Nombres',
+            //     ),
+            //     validator: (value) => value == null || value.isEmpty ? 'Enter your First Name' : null,
+            //   ),
+            //   const SizedBox(height: 16),
+            //   TextFormField(
+            //     controller: _lastNameController,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Apellidos',
+            //     ),
+            //     validator: (value) => value == null || value.isEmpty ? 'Enter your Last Name' : null,
+            //   ),
+            //   const SizedBox(height: 16),
+            //   TextFormField(
+            //     controller: _telephoneController,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Número telefónico'
+            //     ),
+            //     keyboardType: TextInputType.phone,
+            //     validator: (value) {
+            //       if (value == null || value.isEmpty) {
+            //         return 'Ingresa un número telefónico';
+            //       }
+            //       if (!RegExp(r'^\d{9,15}$').hasMatch(value)) {
+            //         return 'Número inválido';
+            //       }
+            //       return null;
+            //     },
+            //   ),
+            //   const SizedBox(height: 16),
+            //   TextFormField(
+            //     controller: _birthDateController,
+            //     decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Birth Date', suffixIcon: Icon(Icons.calendar_today)),
+            //     readOnly: true,
+            //     onTap: () async {
+            //       final initial = DateTime(2000);
+            //       final firstDate = DateTime(1900);
+            //       final lastDate = DateTime(2020);
+            //       final pickedDate = await showDatePicker(
+            //         context: context, 
+            //         initialDate: initial,
+            //         firstDate: firstDate,
+            //         lastDate: lastDate,
+            //         initialEntryMode: DatePickerEntryMode.calendarOnly,
+            //         initialDatePickerMode: DatePickerMode.year,
+            //         helpText: 'Fecha de Nacimiento',
+            //       );
+            //       if (pickedDate != null) {
+            //         setState(() {
+            //           _selectedBirthDate = pickedDate;
+            //           _birthDateController.text = 
+            //             "${pickedDate.day.toString().padLeft(2, '0')}/"
+            //             "${pickedDate.month.toString().padLeft(2, '0')}/"
+            //             "${pickedDate.year}";
+            //         });
+            //       }
+            //     },
+            //     validator: (value) => value == null || value.isEmpty ? 'Select Birth Date' : null,
+            //   ),
+            //   const SizedBox(height: 16),
+            //   TextFormField(
+            //     controller: _emailController,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Correo Electronico',
+            //     ),
+            //     keyboardType: TextInputType.emailAddress,
+            //     validator: (value) => value == null || value.isEmpty ? 'Enter an email' : null,
+            //   ),
+            //   const SizedBox(height: 16),
+            //   TextFormField(
+            //     controller: _passwordController,
+            //     obscureText: _obscurePassword,
+            //     decoration: InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Contraseña',
+            //       suffixIcon: IconButton(
+            //         icon: Icon(
+            //           _obscurePassword
+            //               ? Icons.visibility_off
+            //               : Icons.visibility,
+            //         ),
+            //         onPressed: () {
+            //           setState(() {_obscurePassword = !_obscurePassword;});
+            //         },
+            //       ),
+            //     ),
+            //     validator: (value) => value != null && value.length < 6
+            //         ? 'Password must be at least 6 characters'
+            //         : null,
+            //   ),
+            // ],
           ),
         ),
       ),
     );
   }
 
-  // Widget _navbar(BuildContext context) {
-  //   return BottomAppBar(
-  //     child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //         children: [
-  //           //Text('¿Ya tienes una cuenta?'),
-  //           ElevatedButton.icon(
-  //             icon: const Icon(Icons.home),
-  //             onPressed: () {
-  //               //_formKey.currentState?.reset();
-  //               Navigator.pop(context);
-  //             },
-  //             label: const Text('Regresar a Inicio'),
-  //           )
-  //         ],
-  //       ),
-  //   );
-  // }  
 
   Future <void> _handleSignup(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
@@ -184,15 +348,20 @@ class _RegisterDialogState extends State<RegisterDialog> {
       if (error == null) {
         final user = FirebaseAuth.instance.currentUser;
         if (user != null) {
+          final firstName = _firstNameController.text.trim();
+          final lastName = _lastNameController.text.trim();
+
           final newUser = UserModel(
             uid: user.uid,
             email: _emailController.text.trim(),
-            firstName: _firstNameController.text.trim(),
-            lastName: _lastNameController.text.trim(),
+            firstName: firstName,
+            lastName: lastName,
+            telephoneNumber: _telephoneController.text.trim(),
             birthDate: _selectedBirthDate!,
             isPregnant: false,
           );
           await UserService().createUserDocument(newUser);
+          await user.updateDisplayName('${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}$firstName');
         }
         navigator.pushNamedAndRemoveUntil('HomeScreen', (_) => false);
       } else {

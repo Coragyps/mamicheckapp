@@ -54,6 +54,12 @@ class AppRouting {
           builder: (_) => MyHomePage(title: args.title),
         );
 
+      case 'PregnancyDialog':
+        return MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => const PregnancyDialog(),
+        );
+
       case 'HomeScreen':
         return MaterialPageRoute(builder: (_) => HomeScreen());
 

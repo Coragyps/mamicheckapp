@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
+class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final firebaseuser = FirebaseAuth.instance.currentUser;
 
@@ -36,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   PreferredSizeWidget _titlebar(BuildContext context, firebaseuser) {
     //final email = firebaseuser.email.toString().isNotEmpty ? firebaseuser.email.toString() : '???';
-    final email = firebaseuser?.email ?? '???';
-    final baseColor = _profileColor(email);
+    final avatar = firebaseuser?.displayName ?? '???';
+    final baseColor = _profileColor(avatar);
 
     return AppBar(
       //backgroundColor: Colors.green,
@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ],
             child: CircleAvatar(
               backgroundColor: baseColor.shade900,
-              child: Text(email[0].toUpperCase() + email[1].toUpperCase(), style: TextStyle(color: baseColor.shade100),),
+              child: Text(avatar[0]+avatar[1], style: TextStyle(color: baseColor.shade100))
             ),
           ),
         )
@@ -175,25 +175,51 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
+  // Widget _fab(BuildContext context) {
+  //   return FloatingActionButton(
+  //     onPressed: () {
+  //       showModalBottomSheet(
+  //         context: context,
+  //         isScrollControlled: true,
+  //         //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
+  //         builder: (context) {
+  //           return DraggableScrollableSheet(
+  //             expand: false,
+  //               maxChildSize: 0.9, // Esto da un valor entre 0 y 1
+  //             builder: (context, scrollController) {
+  //               return MeasurementSheet(scrollController: scrollController);
+  //             },
+  //           );
+  //         }
+  //       );
+  //     },
+  //     child: const Icon(Icons.add),
+  //   );
+  // }
+
   Widget _fab(BuildContext context) {
     return FloatingActionButton(
       onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
-          builder: (context) {
-            return DraggableScrollableSheet(
-              expand: false,
-                maxChildSize: 0.9, // Esto da un valor entre 0 y 1
-              builder: (context, scrollController) {
-                return MeasurementSheet(scrollController: scrollController);
-              },
-            );
-          }
-        );
+        Navigator.pushNamed(context, 'PregnancyDialog');
       },
-      child: const Icon(Icons.add),
+      // onPressed: () async {
+      //   final user = FirebaseAuth.instance.currentUser;
+      //   final messenger = ScaffoldMessenger.of(context);
+      //   if (user != null) {
+      //     await user.updateDisplayName('MRMamicheck');
+      //     messenger.showSnackBar(
+      //       SnackBar(content: Text('displayName actualizado para:')),
+      //     );
+      //     messenger.showSnackBar(
+      //       SnackBar(content: Text(user.uid)),
+      //     );
+      //   } else {
+      //     messenger.showSnackBar(
+      //       SnackBar(content: Text('Ningún usuario autenticado')),
+      //     );
+      //   }
+      // },
+      child: const Icon(Icons.addchart_outlined),
     );
   }
 }
