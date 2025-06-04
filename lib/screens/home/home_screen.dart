@@ -1,5 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mamicheckapp/models/pregnancy_model.dart';
+import 'package:mamicheckapp/models/user_model.dart';
+import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:mamicheckapp/screens/home/avatar.dart';
 import 'package:mamicheckapp/screens/screens.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
@@ -52,7 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
       //     ),
       //   ],
       // ),
-      title: Text(_pages[_selectedIndex][4], style: TextStyle(fontFamily: 'Caveat', fontSize: 42)),
+      //title: Text(_pages[_selectedIndex][4], style: TextStyle(fontFamily: 'Caveat', fontSize: 42)),
+      title: Text('Mamicheck', style: TextStyle(fontFamily: 'Caveat', fontSize: 22, color: Color(0xffCA3E7F))),
+      leading: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Image(image: AssetImage('assets/img/logo.png')),
+      ),
       actions: [
         IconButton(
           tooltip: 'Notificaciones',
@@ -191,9 +200,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _fab(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () {
-        Navigator.pushNamed(context, 'PregnancyDialog');
-      },
+      // onPressed: () {
+      //   //Navigator.pushNamed(context, 'PregnancyDialog');
+      //   Navigator.pushNamed(context, 'MeasurementDialog');
+      // },
       // onPressed: () async {
       //   final user = FirebaseAuth.instance.currentUser;
       //   final messenger = ScaffoldMessenger.of(context);
@@ -211,6 +221,31 @@ class _HomeScreenState extends State<HomeScreen> {
       //     );
       //   }
       // },
+
+      onPressed: () {
+        final uid = context.read<User>().uid;
+        final userModel = context.read<UserModel?>();
+        final allPregnancies = context.read<List<PregnancyModel>>();
+
+        final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers.isNotEmpty && p.followers.first == uid && p.isActive);
+
+        if (activePregnancy != null && userModel != null) {
+          Navigator.pushNamed(
+            context,
+            'MeasurementDialog',
+            arguments: MeasurementDialogArguments(pregnancyId: activePregnancy.id, birthDate: userModel.birthDate),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+              title: Text('No se puede registrar'),
+              content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
+            ),
+          );
+        }
+        
+      },
       child: const Icon(Icons.addchart_outlined),
     );
   }

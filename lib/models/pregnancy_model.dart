@@ -103,13 +103,3 @@ class PregnancyModel {
     };
   }
 }
-
-class OwnedPregnancies {
-  final List<PregnancyModel> pregnancies;
-  OwnedPregnancies(this.pregnancies);
-}
-
-class FollowedPregnancies {
-  final List<PregnancyModel> pregnancies;
-  FollowedPregnancies(this.pregnancies);
-}

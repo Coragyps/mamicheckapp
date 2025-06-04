@@ -18,4 +18,17 @@ class UserService {
     if (!doc.exists) return null;
     return UserModel.fromFirestore(doc);
   }
+
+  // Future<UserModel?> getUser(String uid) async {
+  //   final doc = await _db.collection('users').doc(uid).get();
+
+  //   if (!doc.exists) {
+  //     debugPrint('⚠️ Usuario con UID $uid no encontrado en Firestore.');
+  //     return null;
+  //   }
+
+  //   final userModel = UserModel.fromFirestore(doc);
+  //   debugPrint('✅ Usuario cargado desde Firestore: ${userModel.toMap()}');
+  //   return userModel;
+  // }
 }

@@ -55,21 +55,16 @@ class PregnancyService {
     });
   }
 
-  Stream<List<PregnancyModel>> watchOwnedPregnancies(String uid) {
-    return _db
-        .collection('pregnancies')
-        .where('ownerId', isEqualTo: uid)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => PregnancyModel.fromFirestore(doc)).toList());
-  }
-
   Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {
     return _db
         .collection('pregnancies')
         .where('followers', arrayContains: uid)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => PregnancyModel.fromFirestore(doc)).toList());
+        .map((QuerySnapshot snapshot) {
+          return snapshot.docs
+              .where((doc) => doc.exists)
+              .map((doc) => PregnancyModel.fromFirestore(doc))
+              .toList();
+        });
   }
 }

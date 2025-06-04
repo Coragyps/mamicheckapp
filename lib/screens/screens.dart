@@ -7,6 +7,7 @@ export 'package:mamicheckapp/screens/debug/api_test.dart';
 export 'package:mamicheckapp/screens/debug/my_home_page.dart';
 
 export 'package:mamicheckapp/screens/form/measurement_sheet.dart';
+export 'package:mamicheckapp/screens/form/measurement_dialog.dart';
 export 'package:mamicheckapp/screens/form/pregnancy_dialog.dart';
 
 export 'package:mamicheckapp/screens/home/accompany_screen.dart';

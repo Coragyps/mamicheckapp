@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
 import 'package:provider/provider.dart';
@@ -94,15 +95,34 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final owned = context.watch<OwnedPregnancies>().pregnancies;
-    final followed = context.watch<FollowedPregnancies>().pregnancies;
+    // final owned = context.watch<OwnedPregnancies>().pregnancies;
+    // final followed = context.watch<FollowedPregnancies>().pregnancies;
 
-    List<PregnancyModel> _filteredPregnancies = _selectedFilter == SummaryFilter.optionA
-        ? owned
-        : followed;
+    // List<PregnancyModel> filteredPregnancies = _selectedFilter == SummaryFilter.optionA
+    //     ? owned
+    //     : followed;
+
+    final uid = context.read<User>().uid;
+    final allPregnancies = context.watch<List<PregnancyModel>>();
+
+    final owned = allPregnancies.where((p) => p.followers.isNotEmpty && p.followers.first == uid).toList();
+    final followed = allPregnancies.where((p) => p.followers.isNotEmpty && p.followers.first != uid).toList();
+
+    //final owned = allPregnancies.where((p) => p.ownerId == user.uid).toList();
+    //final followed = allPregnancies.where((p) => p.ownerId != user.uid).toList();
+
+    owned.sort((a, b) => b.isActive.toString().compareTo(a.isActive.toString()));
+    followed.sort((a, b) => b.isActive.toString().compareTo(a.isActive.toString()));
+
+    final filteredPregnancies = _selectedFilter == SummaryFilter.optionA ? owned : followed;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text('Seguimiento', style: TextStyle(fontFamily: 'Caveat', fontSize: 42)),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -129,9 +149,9 @@ class _SummaryScreenState extends State<SummaryScreen> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _filteredPregnancies.length,
+            itemCount: filteredPregnancies.length,
             itemBuilder: (_, index) {
-              final pregnancy = _filteredPregnancies[index];
+              final pregnancy = filteredPregnancies[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
                 child: Padding(
@@ -145,6 +165,31 @@ class _SummaryScreenState extends State<SummaryScreen> {
             },
           ),
         ),
+        ElevatedButton(
+          onPressed: () {
+            final uid = context.read<User>().uid;
+            final allPregnancies = context.read<List<PregnancyModel>>();
+
+            final owned = allPregnancies
+                .where((p) => p.followers.isNotEmpty && p.followers.first == uid)
+                .toList();
+
+            final canCreate = owned.isEmpty || owned.every((p) => !p.isActive);
+
+            if (canCreate) {
+              Navigator.pushNamed(context, 'PregnancyDialog');
+            } else {
+              showDialog(
+                context: context,
+                builder: (_) => const AlertDialog(
+                  title: Text('No puedes crear un nuevo embarazo'),
+                  content: Text('Debes finalizar el embarazo activo antes de crear uno nuevo.'),
+                ),
+              );
+            }
+          },
+          child: const Text('Crear embarazo'),
+        )
       ],
     );
   }

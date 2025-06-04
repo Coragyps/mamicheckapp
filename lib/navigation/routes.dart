@@ -54,6 +54,13 @@ class AppRouting {
           builder: (_) => MyHomePage(title: args.title),
         );
 
+      case 'MeasurementDialog':
+        final args = settings.arguments as MeasurementDialogArguments;
+        return MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => MeasurementDialog(pregnancyId: args.pregnancyId, birthDate: args.birthDate,), 
+        );
+
       case 'PregnancyDialog':
         return MaterialPageRoute(
           fullscreenDialog: true,
