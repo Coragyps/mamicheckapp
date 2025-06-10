@@ -18,27 +18,37 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  late List<List<dynamic>> _pages;
   final firebaseuser = FirebaseAuth.instance.currentUser;
 
-  final List<List<dynamic>> _pages = [
-    [SummaryScreen(),'Seguimiento', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services), 'Seguimiento'],
-    [EvolutionScreen(),'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics), 'Mi Evolución'],
-    [AccompanyScreen(),'Acompañar', Icon(Icons.groups_outlined), Icon(Icons.groups), 'Acompañar'],
-  ];
+  void _changeTab(int newIndex) {
+    setState(() {_selectedIndex = newIndex;});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pages = [
+      [SummaryScreen(onTabChange: _changeTab),'Resumen', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services), 'Resumen'],
+      [EvolutionScreen(),'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics), 'Mi Evolución'],
+      [AccompanyScreen(),'Seguimiento', Icon(Icons.groups_outlined), Icon(Icons.groups), 'Seguimiento'],
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
+    //final user = Provider.of<User>(context);
 
     return Scaffold(
-      appBar: _titlebar(context, user),
+      appBar: _titlebar(context),
       body: _body(context),
       bottomNavigationBar: _navbar(context),
       floatingActionButton: _fab(context),
     );
   }
 
-  PreferredSizeWidget _titlebar(BuildContext context, User user) {
+  PreferredSizeWidget _titlebar(BuildContext context) {
 
     return AppBar(
       //backgroundColor: Colors.green,
@@ -87,9 +97,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 case 'api':
                   Navigator.pushNamed(context, 'APITest');
                   break;
-                case 'measurements':
-                  Navigator.pushNamed(context, 'MeasurementsScreen');
-                  break;
                 case 'help':
                   Navigator.pushNamed(context, 'HelpScreen');
                   break;
@@ -137,9 +144,6 @@ class _HomeScreenState extends State<HomeScreen> {
               const PopupMenuItem<String>(value: 'api', child: Row(
                 children: [SizedBox(width: 8,), Text('Prueba de API ML')],
               )),
-              const PopupMenuItem<String>(value: 'measurements', child: Row(
-                children: [Icon(Icons.monitor_heart_outlined), SizedBox(width: 8,), Text('Todas las Mediciones')],
-              )),
               const PopupMenuDivider(),
               const PopupMenuItem<String>(value: 'help', child: Row(
                 children: [Icon(Icons.help_outline), SizedBox(width: 8,), Text('Ayuda')],
@@ -162,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
       children: _pages.map((item) => item[0] as Widget).toList(),
     );
   } 
-
 
   Widget _navbar(BuildContext context) {
     return NavigationBar(
@@ -198,42 +201,49 @@ class _HomeScreenState extends State<HomeScreen> {
   //   );
   // }
 
+  // Widget _fab(BuildContext context) {
+  //   final userModel = context.watch<UserModel?>();
+  //   if (userModel == null) return const SizedBox.shrink();
+  //   return FloatingActionButton(
+
+  //     onPressed: () {
+  //       final allPregnancies = context.read<List<PregnancyModel>>();
+  //       final userModel = context.read<UserModel>();
+        
+  //       final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
+
+  //       if (activePregnancy != null) {
+  //         Navigator.pushNamed(
+  //           context,
+  //           'MeasurementDialog',
+  //           arguments: MeasurementDialogArguments(pregnancy: activePregnancy, birthDate: userModel.birthDate),
+  //         );
+  //       } else {
+  //         showDialog(
+  //           context: context,
+  //           builder: (_) => const AlertDialog(
+  //             title: Text('No se puede registrar'),
+  //             content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
+  //           ),
+  //         );
+  //       }
+        
+  //     },
+  //     child: const Icon(Icons.addchart_outlined),
+  //   );
+  // }
+
   Widget _fab(BuildContext context) {
+    final userModel = context.watch<UserModel?>();
+    final allPregnancies = context.watch<List<PregnancyModel>>();
+    if (userModel == null) return const SizedBox.shrink();
+
+    final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
+
     return FloatingActionButton(
-      // onPressed: () {
-      //   //Navigator.pushNamed(context, 'PregnancyDialog');
-      //   Navigator.pushNamed(context, 'MeasurementDialog');
-      // },
-      // onPressed: () async {
-      //   final user = FirebaseAuth.instance.currentUser;
-      //   final messenger = ScaffoldMessenger.of(context);
-      //   if (user != null) {
-      //     await user.updateDisplayName('MRMamicheck');
-      //     messenger.showSnackBar(
-      //       SnackBar(content: Text('displayName actualizado para:')),
-      //     );
-      //     messenger.showSnackBar(
-      //       SnackBar(content: Text(user.uid)),
-      //     );
-      //   } else {
-      //     messenger.showSnackBar(
-      //       SnackBar(content: Text('Ningún usuario autenticado')),
-      //     );
-      //   }
-      // },
-
       onPressed: () {
-        final uid = context.read<User>().uid;
-        final userModel = context.read<UserModel?>();
-        final allPregnancies = context.read<List<PregnancyModel>>();
-
-        final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers.isNotEmpty && p.followers.first == uid && p.isActive);
-
-        if (activePregnancy != null && userModel != null) {
-          Navigator.pushNamed(
-            context,
-            'MeasurementDialog',
-            arguments: MeasurementDialogArguments(pregnancyId: activePregnancy.id, birthDate: userModel.birthDate),
+        if (activePregnancy != null) {
+          Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate),
           );
         } else {
           showDialog(
@@ -244,9 +254,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         }
-        
       },
       child: const Icon(Icons.addchart_outlined),
     );
   }
+
 }

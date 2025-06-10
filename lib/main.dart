@@ -20,77 +20,20 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MamiCheck',
-      theme: ThemeData(
-        useMaterial3: true,
-        //colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffCA3E7F)),
-      ),
-      debugShowCheckedModeBanner: true,
-      home: const AuthWrapper(),
-      onGenerateRoute: AppRouting.onGenerateRoute,
-    );
-  }
-}
-
-// class AuthWrapper extends StatelessWidget {
-//   const AuthWrapper({super.key});
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return StreamBuilder<User?>(
-//       stream: FirebaseAuth.instance.authStateChanges(),
-//       builder: (context, snapshot) {
-//         if (snapshot.connectionState == ConnectionState.waiting) {
-//           return const Scaffold(body: Center(child: CircularProgressIndicator()),);
-//         } else if (snapshot.hasData) {
-//           return const HomeScreen();
-//         } else {
-//           return const LoginScreen();
-//         }
-//       },
-//     );
-//   }
-// }
-
-// class AuthWrapper extends StatelessWidget {
-//   const AuthWrapper({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder<User?>(
-//       stream: FirebaseAuth.instance.authStateChanges(),
-//       builder: (context, snapshot) {
-//         if (snapshot.connectionState == ConnectionState.waiting) {
-//           return const Scaffold(body: Center(child: CircularProgressIndicator()));
-//         } else if (snapshot.hasData) {
-//           final user = snapshot.data!;
-//           return MultiProvider(
-//             providers: [
-//               StreamProvider<OwnedPregnancies>(
-//                 create: (_) => PregnancyService()
-//                     .watchOwnedPregnancies(user.uid)
-//                     .map((list) => OwnedPregnancies(list)),
-//                 initialData: OwnedPregnancies([]),
-//               ),
-//               StreamProvider<FollowedPregnancies>(
-//                 create: (_) => PregnancyService()
-//                     .watchFollowedPregnancies(user.uid)
-//                     .map((list) => FollowedPregnancies(list)),
-//                 initialData: FollowedPregnancies([]),
-//               ),
-//             ],
-//             child: HomeScreen(),
-//           );
-//         } else {
-//           return const LoginScreen();
-//         }
-//       },
+//     return MaterialApp(
+//       title: 'MamiCheck',
+//       theme: ThemeData(
+//         useMaterial3: true,
+//         //colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffCA3E7F)),
+//       ),
+//       debugShowCheckedModeBanner: true,
+//       home: const AuthWrapper(),
+//       onGenerateRoute: AppRouting.onGenerateRoute,
 //     );
 //   }
 // }
@@ -107,75 +50,44 @@ class MyApp extends StatelessWidget {
 //           return const Scaffold(
 //             body: Center(child: CircularProgressIndicator()),
 //           );
-//         } else if (snapshot.hasData) {
-//           final user = snapshot.data!;
-//           return MultiProvider(
-//             providers: [
-//               Provider<User>.value(value: user), // 👉 inyecta el usuario
-//               StreamProvider<OwnedPregnancies>(
-//                 create: (_) => PregnancyService()
-//                     .watchOwnedPregnancies(user.uid)
-//                     .map((list) => OwnedPregnancies(list)),
-//                 initialData: OwnedPregnancies([]),
-//                 lazy: false,
-//               ),
-//               StreamProvider<FollowedPregnancies>(
-//                 create: (_) => PregnancyService()
-//                     .watchFollowedPregnancies(user.uid)
-//                     .map((list) => FollowedPregnancies(list)),
-//                 initialData: FollowedPregnancies([]),
-//                 lazy: false,
-//               ),
-//             ],
-//             builder: (context, child) => const HomeScreen(),
-//           );
-//         } else {
-//           return const LoginScreen();
 //         }
+
+//         final user = snapshot.data;
+//         if (user == null) {return const LoginScreen();}
+//         return MultiProvider(
+//           providers: [
+//             Provider<User>.value(value: user),
+//             FutureProvider<UserModel?>(
+//               create: (_) => UserService().getUser(user.uid),
+//               initialData: null,
+//               lazy: false,
+//             ),
+//             StreamProvider<List<PregnancyModel>>(
+//               create: (_) => PregnancyService().watchFollowedPregnancies(user.uid),
+//               initialData: const [],
+//               lazy: false,
+//             ),
+//           ],
+//           child: const HomeScreen(),
+//         );
+
 //       },
 //     );
 //   }
 // }
 
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
+        if (snapshot.connectionState == ConnectionState.waiting) {return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));}
         final user = snapshot.data;
-        if (user == null) {return const LoginScreen();}
-        // return Provider<User>.value(
-        //   value: user,
-        //   child: StreamProvider<List<PregnancyModel>>(
-        //     create: (_) => PregnancyService().watchFollowedPregnancies(user.uid),
-        //     initialData: const [],
-        //     lazy: false,
-        //     child: const HomeScreen(),
-        //   ),
-        // );
-        // return Provider<User>.value(
-        //   value: user,
-        //   child: FutureProvider<UserModel?>(
-        //     create: (_) => UserService().getUser(user.uid),
-        //     initialData: null,
-        //     child: StreamProvider<List<PregnancyModel>>(
-        //       create: (_) => PregnancyService().watchFollowedPregnancies(user.uid),
-        //       initialData: const [],
-        //       lazy: false,
-        //       child: const HomeScreen(),
-        //     ),
-        //   ),
-        // );
-        
+        if (user == null) {return const MaterialApp(home: LoginScreen());}
+
         return MultiProvider(
           providers: [
             Provider<User>.value(value: user),
@@ -185,14 +97,33 @@ class AuthWrapper extends StatelessWidget {
               lazy: false,
             ),
             StreamProvider<List<PregnancyModel>>(
-              create: (_) => PregnancyService().watchFollowedPregnancies(user.uid),
+              create: (_) => PregnancyService().watchFollowedPregnancies(user.uid).map((pregnancies) {
+                pregnancies.sort((a, b) {
+                  // Primero por activos (true > false)
+                  final activeCompare = b.isActive.toString().compareTo(a.isActive.toString());
+                  if (activeCompare != 0) return activeCompare;
+
+                  // Luego por rol del usuario (owner antes que companion)
+                  final roleA = a.followers[user.uid];
+                  final roleB = b.followers[user.uid];
+                  if (roleA == roleB) return 0;
+                  if (roleA == 'owner') return -1;
+                  return 1;
+                });
+                return pregnancies;
+              }),
               initialData: const [],
               lazy: false,
             ),
           ],
-          child: const HomeScreen(),
+          child: MaterialApp(
+            title: 'MamiCheck',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(useMaterial3: true),
+            home: const HomeScreen(),
+            onGenerateRoute: AppRouting.onGenerateRoute,
+          ),
         );
-
       },
     );
   }

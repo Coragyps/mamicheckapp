@@ -55,16 +55,29 @@ class PregnancyService {
     });
   }
 
+  // Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {
+  //   return _db
+  //       .collection('pregnancies')
+  //       .where('followers', arrayContains: uid)
+  //       .snapshots()
+  //       .map((QuerySnapshot snapshot) {
+  //         return snapshot.docs
+  //             .where((doc) => doc.exists)
+  //             .map((doc) => PregnancyModel.fromFirestore(doc))
+  //             .toList();
+  //       });
+  // }
+
   Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {
     return _db
-        .collection('pregnancies')
-        .where('followers', arrayContains: uid)
-        .snapshots()
-        .map((QuerySnapshot snapshot) {
-          return snapshot.docs
-              .where((doc) => doc.exists)
-              .map((doc) => PregnancyModel.fromFirestore(doc))
-              .toList();
-        });
+      .collection('pregnancies')
+      .where('followers.$uid', whereIn: ["owner", "companion"])
+      .snapshots()
+      .map((QuerySnapshot snapshot) {
+        return snapshot.docs
+          .where((doc) => doc.exists)
+          .map((doc) => PregnancyModel.fromFirestore(doc))
+          .toList();
+      });
   }
 }
