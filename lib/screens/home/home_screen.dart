@@ -255,8 +255,30 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
       },
-      child: const Icon(Icons.addchart_outlined),
+      child: const Icon(Icons.add),
     );
   }
+
+  // Widget _fab(BuildContext context) {
+  //   return FloatingActionButton(
+  //     onPressed: () {
+  //       showModalBottomSheet(
+  //         context: context,
+  //         isScrollControlled: true,
+  //         //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
+  //         builder: (context) {
+  //           return DraggableScrollableSheet(
+  //             expand: false,
+  //               maxChildSize: 0.9, // Esto da un valor entre 0 y 1
+  //             builder: (context, scrollController) {
+  //               return MeasurementSheet(scrollController: scrollController);
+  //             },
+  //           );
+  //         }
+  //       );
+  //     },
+  //     child: const Icon(Icons.add),
+  //   );
+  // }
 
 }

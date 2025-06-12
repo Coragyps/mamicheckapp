@@ -3,6 +3,8 @@ import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
 import 'package:mamicheckapp/models/user_model.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
+import 'package:mamicheckapp/screens/form/measurement_sheet.dart';
+import 'package:mamicheckapp/services/measurement_service.dart';
 import 'package:provider/provider.dart';
 
 class MeasurementsScreen extends StatefulWidget {
@@ -187,7 +189,40 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
                   DataCell(Text('${m.age}')),
                   DataCell(Text(m.bloodSugar?.toString() ?? '-')),
                   DataCell(Text(m.temperature?.toString() ?? '-')),
-                  _riskCell(m.riskLevel),
+                  //_riskCell(m.riskLevel),
+                  //_riskCell(measurements, m),
+                  // DataCell(
+                  //   showEditIcon: m.riskLevel == null ? true : false,
+                  //   m.riskLevel != null
+                  //   ? Chip(label: Text(['Baja', 'Media', 'Alta'][m.riskLevel!]), backgroundColor: [Colors.green[200], Colors.orange[200], Colors.red[200]][m.riskLevel!])
+                  //   : const Text('Editar'),
+                  // ),
+                  if (m.riskLevel != null) 
+                    DataCell(Chip(label: Text(['Baja', 'Media', 'Alta'][m.riskLevel!]), backgroundColor: [Colors.green[200], Colors.orange[200], Colors.red[200]][m.riskLevel!])) else
+                    DataCell(
+                      const Text('Editar'),
+                      showEditIcon: true,
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) {
+                            return DraggableScrollableSheet(
+                              expand: false,
+                              maxChildSize: 0.9,
+                              builder: (context, scrollController) {
+                                return MeasurementSheet(
+                                  scrollController: scrollController,
+                                  measurement: m,
+                                  measurements: measurements,
+                                  pregnancyId: widget.pregnancyId
+                                );
+                              }
+                            );
+                          },
+                        );
+                      },
+                    ),
                   DataCell(
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 300),
@@ -224,20 +259,82 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
     return Text('${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}\n${date.day}/${date.month}/${date.year}');
   }
 
-  DataCell _riskCell(int? level) {
-    switch (level) {
-      case 0:
-        return DataCell(Chip(label: Text('Baja'), backgroundColor: Colors.green[200]));
-      case 1:
-        return DataCell(Chip(label: Text('Medio'), backgroundColor: Colors.orange[200]));
-      case 2:
-        return DataCell(Chip(label: Text('Alta'), backgroundColor: Colors.red[200]));
-      default:
-        return DataCell(Text('Editar'), showEditIcon: true, onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Mostrar aqui para editar")),);
+  // DataCell _riskCell(int? level) {
+  //   switch (level) {
+  //     case 0:
+  //       return DataCell(Chip(label: Text('Baja'), backgroundColor: Colors.green[200]));
+  //     case 1:
+  //       return DataCell(Chip(label: Text('Medio'), backgroundColor: Colors.orange[200]));
+  //     case 2:
+  //       return DataCell(Chip(label: Text('Alta'), backgroundColor: Colors.red[200]));
+  //     default:
+  //       return DataCell(Text('Editar'), showEditIcon: true, onTap: () {
+  //         showModalBottomSheet(
+  //           context: context,
+  //           isScrollControlled: true,
+  //           builder: (context) {
+  //             return DraggableScrollableSheet(
+  //               expand: false,
+  //               maxChildSize: 0.9,
+  //               builder: (context, scrollController) {
+  //                 return MeasurementSheet(scrollController: scrollController);
+  //               }
+  //             );
+  //           }
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
+  ///-----------------------------------------------------
+  // DataCell _riskCell(PregnancyModel pregnancy, MeasurementModel m) {
+  //   final incompletos = <String>[];
+  //   if (m.bloodSugar == null) incompletos.add('Glucosa');
+  //   if (m.temperature == null) incompletos.add('Temperatura');
+  //   if (m.riskLevel == null) incompletos.add('Riesgo');
 
-        },);
-    }
-  }
+  //   final hayFaltantes = incompletos.isNotEmpty;
 
+  //   if (hayFaltantes) {
+  //     return DataCell(
+  //       Text('Completar'),
+  //       showEditIcon: true,
+  //       onTap: () {
+  //         showModalBottomSheet(
+  //           context: context,
+  //           isScrollControlled: true,
+  //           backgroundColor: Colors.transparent,
+  //           builder: (context) {
+  //             return DraggableScrollableSheet(
+  //               expand: false,
+  //               maxChildSize: 0.9,
+  //               builder: (context, scrollController) {
+  //                 return MeasurementSheet(
+  //                   scrollController: scrollController,
+  //                   measurement: m,
+  //                   onSave: (updated) async {
+  //                     // Actualiza el documento en Firestore o localmente
+  //                     await MeasurementService().editMeasurement(pregnancy, updated);
+  //                     setState(() {}); // Forzar reconstrucción si es necesario
+  //                   },
+  //                 );
+  //               },
+  //             );
+  //           },
+  //         );
+  //       },
+  //     );
+  //   }
+
+  //   switch (m.riskLevel) {
+  //     case 0:
+  //       return DataCell(Chip(label: Text('Baja'), backgroundColor: Colors.green[200]));
+  //     case 1:
+  //       return DataCell(Chip(label: Text('Medio'), backgroundColor: Colors.orange[200]));
+  //     case 2:
+  //       return DataCell(Chip(label: Text('Alta'), backgroundColor: Colors.red[200]));
+  //     default:
+  //       return DataCell(Text('-'));
+  //   }
+  // }
 }

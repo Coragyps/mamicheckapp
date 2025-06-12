@@ -1,68 +1,278 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mamicheckapp/models/measurement_model.dart';
+import 'package:mamicheckapp/services/measurement_service.dart';
+import 'package:http/http.dart' as http;
 
-class MeasurementSheet extends StatelessWidget {
+// class MeasurementSheet extends StatelessWidget {
+//   final ScrollController scrollController;
+//   const MeasurementSheet({super.key, required this.scrollController});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: const BoxDecoration(
+//         //color: Colors.white,
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//       ),
+
+
+      
+//       child: Column(
+//         mainAxisSize: MainAxisSize.max,
+//         children: [
+//           // Contenido desplazable
+//           Expanded(
+//             child: SingleChildScrollView(
+//               controller: scrollController,
+//               child: Padding(
+//                 padding: const EdgeInsets.symmetric(horizontal: 16),
+//                 child: Column(
+//                   children: [
+//                     const SizedBox(height: 16),
+//                     const Text('Aquí va tu contenido', style: TextStyle(fontSize: 16)),
+//                     const SizedBox(height: 12),
+//                     for (var i = 0; i < 30; i++) ListTile(title: Text('Item $i')),
+//                     const SizedBox(height: 24),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+
+//           // Botones fijos abajo
+//           Padding(
+//             padding: const EdgeInsets.all(16),
+//             child: Row(
+//               children: [
+//                 Expanded(
+//                   child: OutlinedButton(
+//                     onPressed: () => Navigator.of(context).pop(),
+//                     child: const Text('Cancelar'),
+//                   ),
+//                 ),
+//                 const SizedBox(width: 12),
+//                 Expanded(
+//                   child: ElevatedButton(
+//                     onPressed: () {
+//                       Navigator.of(context).pop();
+//                       ScaffoldMessenger.of(context).showSnackBar(
+//                         const SnackBar(content: Text('Guardado exitosamente')),
+//                       );
+//                     },
+//                     child: const Text('Guardar'),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+class MeasurementSheet extends StatefulWidget {
   final ScrollController scrollController;
-  const MeasurementSheet({super.key, required this.scrollController});
+  final MeasurementModel measurement;
+  final List<MeasurementModel> measurements;
+  final String pregnancyId;
+
+  const MeasurementSheet({
+    super.key,
+    required this.scrollController,
+    required this.measurement,
+    required this.measurements,
+    required this.pregnancyId,
+  });
+
+  @override
+  State<MeasurementSheet> createState() => _MeasurementSheetState();
+}
+
+class _MeasurementSheetState extends State<MeasurementSheet> {
+  final _formKey = GlobalKey<FormState>();
+  final _bloodSugarController = TextEditingController();
+  final _temperatureController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.measurement.bloodSugar != null) {
+      _bloodSugarController.text = widget.measurement.bloodSugar.toString();
+    }
+    if (widget.measurement.temperature != null) {
+      _temperatureController.text = widget.measurement.temperature.toString();
+    }
+  }
+
+  @override
+  void dispose() {
+    _bloodSugarController.dispose();
+    _temperatureController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          // Contenido desplazable
-          Expanded(
-            child: SingleChildScrollView(
-              controller: scrollController,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    const Text('Aquí va tu contenido', style: TextStyle(fontSize: 16)),
-                    const SizedBox(height: 12),
-                    for (var i = 0; i < 30; i++) ListTile(title: Text('Item $i')),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ),
-          ),
+    final showBloodSugar = widget.measurement.bloodSugar == null;
+    final showTemperature = widget.measurement.temperature == null;
 
-          // Botones fijos abajo
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancelar'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Guardado exitosamente')),
-                      );
-                    },
-                    child: const Text('Guardar'),
-                  ),
-                ),
-              ],
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 16,
+        left: 16,
+        right: 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+      ),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          controller: widget.scrollController,
+          children: [
+            const Text(
+              'Completa los campos faltantes:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            if (showBloodSugar)
+              TextFormField(
+                controller: _bloodSugarController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Glucosa en sangre (mmol/L)', border: OutlineInputBorder(), suffixText: 'mmol/L'),
+                validator: (value) {
+                  if (value!.trim().isEmpty) return 'Ingresa un valor de glucosa';
+                  final parsed = double.tryParse(value.trim());
+                  if (parsed == null) return 'Debe ser un número válido';
+                  if (parsed < 2.0 || parsed > 22.0) return 'Debe estar entre 2.0 y 22.0 mmol/L';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+            if (showTemperature)
+              TextFormField(
+                controller: _temperatureController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Temperatura', border: OutlineInputBorder(), suffixText: '°C'),
+                validator: (value) {
+                  if (value!.trim().isEmpty) return 'Ingresa una temperatura';
+                  final parsed = double.tryParse(value.trim());
+                  if (parsed == null) return 'Debe ser un número válido';
+                  if (parsed < 34 || parsed > 42) return 'Debe estar entre 34.0 y 42.0 °C';
+                  return null;
+                },
+              ),
+            ElevatedButton(
+              onPressed: _saveChanges,
+              child: const Text('Guardar'),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  // void _saveChanges() async {
+  //   final navigator = Navigator.of(context);
+  //   final messenger = ScaffoldMessenger.of(context);
+
+  //   if (_formKey.currentState!.validate()) {
+  //     final updated = widget.measurement.copyWith(
+  //       bloodSugar: widget.measurement.bloodSugar ?? double.tryParse(_bloodSugarController.text),
+  //       temperature: widget.measurement.temperature ?? double.tryParse(_temperatureController.text),
+  //     );
+
+  //     await MeasurementService().updateMeasurement(
+  //       pregnancyId: widget.pregnancyId,
+  //       currentMeasurements: widget.measurements,
+  //       updatedMeasurement: updated,
+  //     );
+
+  //     navigator.pop();
+  //   }
+  // }
+
+  void _saveChanges() async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    if (_formKey.currentState!.validate()) {
+      int? riskLevel;
+
+      final age = widget.measurement.age; // Asumimos que ya existe
+      final systolic = widget.measurement.systolicBP;
+      final diastolic = widget.measurement.diastolicBP;
+      final heartRate = widget.measurement.heartRate;
+      final bloodSugar = double.tryParse(_bloodSugarController.text);
+      final temperature = double.tryParse(_temperatureController.text);
+
+      if (bloodSugar != null && temperature != null) {
+        final url = Uri.parse("https://predict-kuhtf7qpsa-uc.a.run.app/us-central1/predict");
+        final body = {
+          "Age": age,
+          "SystolicBP": systolic,
+          "DiastolicBP": diastolic,
+          "BS": bloodSugar,
+          "BodyTemp": temperature,
+          "HeartRate": heartRate,
+        };
+
+        try {
+          final response = await http.post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: json.encode(body),
+          );
+
+          if (response.statusCode == 200) {
+            final decoded = json.decode(response.body);
+            riskLevel = int.tryParse(decoded.toString());
+
+            final riskText = switch (riskLevel) {
+              0 => 'Riesgo Bajo',
+              1 => 'Riesgo Medio',
+              2 => 'Riesgo Alto',
+              _ => 'Riesgo Desconocido'
+            };
+            final riskColor = switch (riskLevel) {
+              0 => Colors.green,
+              1 => Colors.orange,
+              2 => Colors.red,
+              _ => Colors.blue
+            };
+
+            messenger.showSnackBar(SnackBar(
+              content: Text(riskText),
+              backgroundColor: riskColor,
+            ));
+
+          } else {
+            messenger.showSnackBar(SnackBar(
+              content: Text('Error ${response.statusCode}: ${response.body}'),
+              backgroundColor: Colors.blue,
+            ));
+          }
+        } catch (e) {
+          messenger.showSnackBar(SnackBar(
+            content: Text('Error de red: $e'),
+            backgroundColor: Colors.blue,
+          ));
+        }
+      }
+
+      final updated = widget.measurement.copyWith(
+        bloodSugar: widget.measurement.bloodSugar ?? bloodSugar,
+        temperature: widget.measurement.temperature ?? temperature,
+        riskLevel: riskLevel ?? widget.measurement.riskLevel,
+      );
+
+      await MeasurementService().updateMeasurement(
+        pregnancyId: widget.pregnancyId,
+        currentMeasurements: widget.measurements,
+        updatedMeasurement: updated,
+      );
+
+      navigator.pop();
+    }
+  }
 }
-
-

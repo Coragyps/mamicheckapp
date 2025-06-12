@@ -119,4 +119,28 @@ class MeasurementModel {
 
     return map;
   }
+
+  MeasurementModel copyWith({
+    int? systolicBP,
+    int? diastolicBP,
+    int? heartRate,
+    int? age,
+    double? bloodSugar,
+    double? temperature,
+    int? riskLevel,
+    String? notes,
+    DateTime? date,
+  }) {
+    return MeasurementModel(
+      systolicBP: systolicBP ?? this.systolicBP,
+      diastolicBP: diastolicBP ?? this.diastolicBP,
+      heartRate: heartRate ?? this.heartRate,
+      age: age ?? this.age,
+      bloodSugar: bloodSugar ?? this.bloodSugar,
+      temperature: temperature ?? this.temperature,
+      riskLevel: riskLevel ?? this.riskLevel,
+      notes: notes ?? this.notes,
+      date: date ?? this.date,
+    );
+  }
 }
