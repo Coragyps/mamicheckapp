@@ -248,7 +248,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                pregnancy.name ?? 'Embarazo sin título',
+                pregnancy.name,
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -262,15 +262,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
               const SizedBox(height: 8),
               Text('Seguimiento: ${pregnancy.followers.length} personas'),
               // Puedes añadir más detalles
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  onPressed: () {Navigator.pushNamed(context, 'MeasurementsScreen', arguments: MeasurementsScreenArguments(pregnancyId: pregnancy.id));},
-                  icon: const Icon(Icons.list),
-                  label: const Text('Ver tabla de Mediciones'),
-                ),
-              ),
             ],
           ),
         ),

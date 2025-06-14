@@ -118,8 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           TextButton(
                             child: const Text('Acepto'),
                             onPressed: () async {
-                              await AuthService().signout();
                               dialognavigator.pop();
+                              await Future.delayed(Duration.zero);
+                              await AuthService().signout();                              
                             },
                           )
                         ], 
@@ -235,14 +236,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _fab(BuildContext context) {
     final userModel = context.watch<UserModel?>();
-    final allPregnancies = context.watch<List<PregnancyModel>>();
+    final activePregnancy = context.watch<List<PregnancyModel>>().firstOrNull;
+    //final allPregnancies = context.watch<List<PregnancyModel>>();
     if (userModel == null) return const SizedBox.shrink();
 
-    final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
-
+    //final activePregnancy = allPregnancies.firstOrNull;
+    //final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
     return FloatingActionButton(
       onPressed: () {
-        if (activePregnancy != null) {
+        if (activePregnancy != null && activePregnancy.followers[userModel.uid] == 'owner' && activePregnancy.isActive) {
           Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate),
           );
         } else {

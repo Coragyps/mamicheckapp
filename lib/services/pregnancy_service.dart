@@ -37,22 +37,17 @@ class PregnancyService {
 
     // Combinar sin duplicados
     final allDocs = {...querySnapshot.docs, ...ownerQuerySnapshot.docs};
-
     return allDocs.map((doc) => PregnancyModel.fromFirestore(doc)).toList();
   }
 
-  /// Agrega un UID a la lista de seguidores del embarazo
   Future<void> addFollower(String pregnancyId, String uid) async {
-    await _db.collection('pregnancies').doc(pregnancyId).update({
-      'followers': FieldValue.arrayUnion([uid])
-    });
+    final docRef = FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId);
+    await docRef.update({'followers.$uid': 'companion'});
   }
 
-  /// Elimina un UID de la lista de seguidores
   Future<void> removeFollower(String pregnancyId, String uid) async {
-    await _db.collection('pregnancies').doc(pregnancyId).update({
-      'followers': FieldValue.arrayRemove([uid])
-    });
+    final docRef = FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId);
+    await docRef.update({'followers.$uid': FieldValue.delete()});
   }
 
   // Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {

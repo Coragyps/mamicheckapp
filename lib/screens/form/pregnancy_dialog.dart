@@ -13,6 +13,7 @@ class PregnancyDialog extends StatefulWidget {
 }
 
 class _PregnancyDialogState extends State<PregnancyDialog> {
+  bool _isSaving = false;
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _lastMenstrualPeriodController = TextEditingController();
@@ -61,8 +62,10 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
         Padding(
           padding: const EdgeInsets.only(right: 16),
           child: FilledButton(
-            onPressed: () => _handleCreatePregnancy(context),
-            child: const Text('Guardar'),
+            onPressed: _isSaving ? null : () => _handleCreatePregnancy(context),
+            child: _isSaving
+            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+            : const Text('Guardar'),
           ),
         )
       ],
@@ -80,6 +83,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               // Fecha de última menstruación (calcular semanas)
               TextFormField(
                 controller: _lastMenstrualPeriodController,
+                enabled: !_isSaving,
                 readOnly: true,
                 decoration: const InputDecoration(
                   labelText: 'Last Menstrual Period',
@@ -113,7 +117,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               SwitchListTile(
                 title: Text('¿Este es tu primer embarazo?'),
                 value: _isFirstPregnancy,
-                onChanged: (value) {
+                onChanged: _isSaving ? null : (value) {
                   setState(() {
                     _isFirstPregnancy = value;
                     if (_isFirstPregnancy) {
@@ -139,8 +143,8 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) => value == null || value.isEmpty ? 'Ingrese la cantidad de embarazos' : null,
-                readOnly: _isFirstPregnancy,
-                enabled: !_isFirstPregnancy,
+                //readOnly: _isFirstPregnancy,
+                enabled: !_isSaving && !_isFirstPregnancy,
               ),
               const SizedBox(height: 16),
 
@@ -151,15 +155,15 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                readOnly: _isFirstPregnancy,
-                enabled: !_isFirstPregnancy,
+                //readOnly: _isFirstPregnancy,
+                enabled: !_isSaving && !_isFirstPregnancy,
               ),
               const SizedBox(height: 16),
 
               TextFormField(
                 controller: _intervalController,
-                readOnly: true,
-                enabled: !_isFirstPregnancy, // Deshabilita totalmente el campo si es el primer embarazo
+                //readOnly: true,
+                enabled: !_isSaving && !_isFirstPregnancy, // Deshabilita totalmente el campo si es el primer embarazo
                 decoration: const InputDecoration(
                   labelText: 'Fecha del último parto (Intervalo intergenesico)',
                   border: OutlineInputBorder(),
@@ -196,9 +200,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               CheckboxListTile(
                 title: Text('¿Tuviste complicación hipertensiva o preeclampsia antes?'),
                 value: _previousHypertensiveDisorder,
-                onChanged: _isFirstPregnancy
-                    ? null
-                    : (val) => setState(() => _previousHypertensiveDisorder = val ?? false),
+                onChanged: _isFirstPregnancy || _isSaving ? null : (val) => setState(() => _previousHypertensiveDisorder = val ?? false),
               ),
 
               DropdownButtonFormField<int>(
@@ -207,7 +209,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                   border: OutlineInputBorder(),
                 ),
                 value: _fetalCount,
-                onChanged: (val) => setState(() => _fetalCount = val!),
+                onChanged: _isSaving ? null : (val) => setState(() => _fetalCount = val!),
                 items: [
                   {'label': 'Aún no sé', 'value': 0},
                   {'label': 'Embarazo Único', 'value': 1},
@@ -226,11 +228,12 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               CheckboxListTile(
                 title: Text('¿Usó técnicas de reproducción asistida?'),
                 value: _assistedReproduction,
-                onChanged: (val) => setState(() => _assistedReproduction = val ?? false),
+                onChanged: _isSaving ? null : (val) => setState(() => _assistedReproduction = val ?? false),
               ),
 
               const SizedBox(height: 16),
               TextFormField(
+                enabled: !_isSaving,
                 controller: _weightController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -240,6 +243,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                enabled: !_isSaving,
                 controller: _heightController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -252,12 +256,12 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               CheckboxListTile(
                 title: Text('¿Lupus Eritematoso Sistémico?'),
                 value: _lupus,
-                onChanged: (val) => setState(() => _lupus = val ?? false),
+                onChanged: _isSaving ? null : (val) => setState(() => _lupus = val ?? false),
               ),
               CheckboxListTile(
                 title: Text('¿Síndrome Antifosfolípido?'),
                 value: _antiphospholipidSyndrome,
-                onChanged: (val) => setState(() => _antiphospholipidSyndrome = val ?? false),
+                onChanged: _isSaving ? null : (val) => setState(() => _antiphospholipidSyndrome = val ?? false),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
@@ -266,7 +270,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                   border: OutlineInputBorder(),
                 ),
                 value: _diabetesHistory,
-                onChanged: (val) => setState(() => _diabetesHistory = val!),
+                onChanged: _isSaving ? null : (val) => setState(() => _diabetesHistory = val!),
                 items: ['Ninguno', 'Diabetes Tipo 1', 'Diabetes Tipo 2']
                     .map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               ),
@@ -274,17 +278,17 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
               CheckboxListTile(
                 title: Text('¿Antecedente familiar de preeclampsia?'),
                 value: _familyHistoryPreeclampsia,
-                onChanged: (val) => setState(() => _familyHistoryPreeclampsia = val ?? false),
+                onChanged: _isSaving ? null : (val) => setState(() => _familyHistoryPreeclampsia = val ?? false),
               ),
               CheckboxListTile(
                 title: Text('¿Hipertensión crónica?'),
                 value: _chronicHypertension,
-                onChanged: (val) => setState(() => _chronicHypertension = val ?? false),
+                onChanged: _isSaving ? null : (val) => setState(() => _chronicHypertension = val ?? false),
               ),
               CheckboxListTile(
                 title: Text('¿Enfermedad Renal crónica?'),
                 value: _chronicKidneyDisease,
-                onChanged: (val) => setState(() => _chronicKidneyDisease = val ?? false),
+                onChanged: _isSaving ? null : (val) => setState(() => _chronicKidneyDisease = val ?? false),
               ),
             ],
           ),
@@ -294,6 +298,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
   }
 
   Future<void> _handleCreatePregnancy(BuildContext context) async {
+    setState(() => _isSaving = true);
     if (_formKey.currentState!.validate()) {
       final messenger = ScaffoldMessenger.of(context);
       final navigator = Navigator.of(context, rootNavigator: true);
@@ -330,7 +335,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
           riskFactors: riskFactorsList,
           followers: {
             widget.uid: 'owner',
-            'nNF18EWgOBb786CFQboARQN8gB53': 'admin',
+            'nNF18EWgOBb786CFQboARQN8gB53': 'companion',
           },
           measurements: [], // Vacío al inicio
         );
@@ -343,6 +348,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
         //navigator.pop();
       }
     }
+    setState(() => _isSaving = false);
   }
 
   int _calculateAge(DateTime birthDate) {

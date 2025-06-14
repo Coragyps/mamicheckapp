@@ -211,7 +211,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
     try {
       if (_camposCompletos()) {
         //api
-        final url = Uri.parse("https://predict-kuhtf7qpsa-uc.a.run.app/us-central1/predict");
+        final url = Uri.parse("https://mamiboot-6zrxpp23tq-uc.a.run.app");
         final body = {
           "Age": _calculateAge(widget.birthDate),
           "SystolicBP": int.parse(_systolicController.text.trim()),

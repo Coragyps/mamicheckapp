@@ -94,6 +94,7 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
   final _formKey = GlobalKey<FormState>();
   final _bloodSugarController = TextEditingController();
   final _temperatureController = TextEditingController();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -137,6 +138,7 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
             const SizedBox(height: 16),
             if (showBloodSugar)
               TextFormField(
+                enabled: !_isSaving,
                 controller: _bloodSugarController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Glucosa en sangre (mmol/L)', border: OutlineInputBorder(), suffixText: 'mmol/L'),
@@ -151,6 +153,7 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
               const SizedBox(height: 16),
             if (showTemperature)
               TextFormField(
+                enabled: !_isSaving,
                 controller: _temperatureController,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(labelText: 'Temperatura', border: OutlineInputBorder(), suffixText: '°C'),
@@ -163,8 +166,10 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
                 },
               ),
             ElevatedButton(
-              onPressed: _saveChanges,
-              child: const Text('Guardar'),
+              onPressed: _isSaving ? null : _saveChanges,
+              child: _isSaving
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+              : const Text('Guardar')
             ),
           ],
         ),
@@ -197,6 +202,7 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
     final messenger = ScaffoldMessenger.of(context);
 
     if (_formKey.currentState!.validate()) {
+      setState(() => _isSaving = true);
       int? riskLevel;
 
       final age = widget.measurement.age; // Asumimos que ya existe
@@ -207,7 +213,7 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
       final temperature = double.tryParse(_temperatureController.text);
 
       if (bloodSugar != null && temperature != null) {
-        final url = Uri.parse("https://predict-kuhtf7qpsa-uc.a.run.app/us-central1/predict");
+        final url = Uri.parse("https://mamiboot-6zrxpp23tq-uc.a.run.app");
         final body = {
           "Age": age,
           "SystolicBP": systolic,
@@ -272,6 +278,7 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
         updatedMeasurement: updated,
       );
 
+      setState(() => _isSaving = false);
       navigator.pop();
     }
   }
