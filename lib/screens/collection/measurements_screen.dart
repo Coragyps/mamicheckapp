@@ -171,7 +171,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
             child: DataTable(
               sortColumnIndex: _sortColumnIndex,
               sortAscending: _sortAscending,
-              columnSpacing: 32,
+              columnSpacing: 24,
               dataRowMaxHeight: 60,
               columns: [
                 _buildSortableColumn('Fecha', 0),

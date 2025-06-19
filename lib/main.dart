@@ -87,7 +87,6 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));}
         final user = snapshot.data;
         if (user == null) {return const MaterialApp(home: LoginScreen());}
-
         return MultiProvider(
           providers: [
             Provider<User>.value(value: user),
@@ -115,11 +114,26 @@ class MyApp extends StatelessWidget {
               initialData: const [],
               lazy: false,
             ),
+            // StreamProvider<PregnancyGroups>(
+            //   create: (_) => PregnancyService().watchFollowedPregnancies(user.uid).map((pregnancies) {
+            //     return PregnancyGroups(
+            //       ownedActive: pregnancies.where((p) =>
+            //         p.followers[user.uid] == 'owner' && p.isActive).toList(), 
+            //       followedActive: pregnancies.where((p) =>
+            //         p.followers[user.uid] == 'companion' && p.isActive).toList(), 
+            //       finished: pregnancies.where((p) => !p.isActive).toList(), 
+            //     );
+            //   }),
+            //   initialData: PregnancyGroups(),
+            //   lazy: false,
+            // ),
           ],
           child: MaterialApp(
             title: 'MamiCheck',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(useMaterial3: true),
+            theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(212, 0, 255, 1))),
+            //theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(18, 169, 56, 1))),
+            //theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(60, 49, 27, 1))),
             home: const HomeScreen(),
             onGenerateRoute: AppRouting.onGenerateRoute,
           ),

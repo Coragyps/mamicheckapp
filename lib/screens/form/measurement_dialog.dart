@@ -85,6 +85,10 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                 title: Text('Fecha: ${_measurementDate.toLocal().toString().split(' ')[0]}'),
                 trailing: const Icon(Icons.calendar_today),
               ),
+              // ListTile(
+              //   title: Text('Fecha: ${widget.birthDate.toLocal().toString().split(' ')[0]}'),
+              //   trailing: const Icon(Icons.calendar_today),
+              // ),
               TextFormField(
                 controller: _systolicController,
                 enabled: !_isSaving,

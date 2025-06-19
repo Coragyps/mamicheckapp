@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 enum SummaryFilter { optionA, optionB }
 
 class SummaryScreen extends StatefulWidget {
-  final void Function(int) onTabChange;
-  const SummaryScreen({super.key, required this.onTabChange});
+  //final void Function(int) onTabChange;
+  const SummaryScreen({super.key, });
 
   @override
   State<SummaryScreen> createState() => _SummaryScreenState();
@@ -232,39 +232,76 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
     return PageView(
       scrollDirection: Axis.vertical,
+      padEnds: true,
+      controller: PageController(
+        viewportFraction: 1
+      ),
       children: pages,
     );
   }
 
+  // Widget _pregnancyPage(PregnancyModel pregnancy) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 0),
+  //     child: Container(
+  //       color: Colors.blue,
+  //       //elevation: 0,
+  //       //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(20),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             const SizedBox(height: 8),
+  //             Text('Semanas de embarazo: ${(DateTime.now().difference(pregnancy.lastMenstrualPeriod).inDays / 7).floor()} Semanas',),
+  //             const SizedBox(height: 8),
+  //             Text('Estado: ${pregnancy.isActive ? "Activo" : "Finalizado"}'),
+  //             const SizedBox(height: 8),
+  //             Text('Cant. de Mediciones: ${pregnancy.measurements.length}'),
+  //             const SizedBox(height: 8),
+  //             Text('Factores de Riesgo: ${pregnancy.riskFactors}'),
+  //             const SizedBox(height: 8),
+  //             Text('Seguimiento: ${pregnancy.followers.length} personas'),
+  //             // Puedes añadir más detalles
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _pregnancyPage(PregnancyModel pregnancy) {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                pregnancy.name,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text('Semanas de embarazo: ${(DateTime.now().difference(pregnancy.lastMenstrualPeriod).inDays / 7).floor()} Semanas',),
-              const SizedBox(height: 8),
-              Text('Estado: ${pregnancy.isActive ? "Activo" : "Finalizado"}'),
-              const SizedBox(height: 8),
-              Text('Cant. de Mediciones: ${pregnancy.measurements.length}'),
-              const SizedBox(height: 8),
-              Text('Factores de Riesgo: ${pregnancy.riskFactors}'),
-              const SizedBox(height: 8),
-              Text('Seguimiento: ${pregnancy.followers.length} personas'),
-              // Puedes añadir más detalles
-            ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+                        Text(
+                  pregnancy.name,
+                  style: const TextStyle(fontSize: 42, fontFamily: 'Caveat'),
+                ),
+                  Text('Semanas de embarazo: ${(DateTime.now().difference(pregnancy.lastMenstrualPeriod).inDays / 7).floor()} Semanas',
+                  style: const TextStyle(fontSize: 20, fontFamily: 'Caveat'),),
+                  const SizedBox(height: 20),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            color: Colors.blue,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text('Estado: ${pregnancy.isActive ? "Activo" : "Finalizado"}'),
+                const SizedBox(height: 8),
+                Text('Cant. de Mediciones: ${pregnancy.measurements.length}'),
+                const SizedBox(height: 8),
+                Text('Factores de Riesgo: ${pregnancy.riskFactors}'),
+                const SizedBox(height: 8),
+                Text('Seguimiento: ${pregnancy.followers.length} personas'),
+                // Puedes añadir más detalles
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -296,7 +333,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                   icon: const Icon(Icons.open_in_new),
                   label: const Text('Ir a Seguimiento'),
                   onPressed: () {
-                    widget.onTabChange(2); // Cambio a pestaña de Acompañar
+                    //widget.onTabChange(2); // Cambio a pestaña de Acompañar
                   },
                 )
               ),

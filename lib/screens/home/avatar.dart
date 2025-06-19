@@ -12,7 +12,6 @@ class Avatar extends StatelessWidget {
         final user = snapshot.data;
         final avatarText = user?.displayName ?? '???';
         final baseColor = _profileColor(avatarText);
-
         return CircleAvatar(
           backgroundColor: baseColor.shade900,
           child: Text(
