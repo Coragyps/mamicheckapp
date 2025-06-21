@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/models/measurement_model.dart';
-import 'package:mamicheckapp/models/pregnancy_model.dart';
 import 'package:mamicheckapp/services/measurement_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class MeasurementDialog extends StatefulWidget {
-  final PregnancyModel pregnancy;
+  final String pregnancyId;
+  final List<MeasurementModel> currentMeasurements;
   final DateTime birthDate;
-  const MeasurementDialog({super.key, required this.pregnancy, required this.birthDate});
+  const MeasurementDialog({super.key, required this.birthDate, required this.pregnancyId, required this.currentMeasurements});
 
   @override
   State<MeasurementDialog> createState() => _MeasurementDialogState();
@@ -79,7 +79,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
             children: [
               // Fecha picker simplificado
               ListTile(
-                title: Text('Embarazo: ${widget.pregnancy.name}'),
+                title: Text('Embarazo: ${widget.pregnancyId}'),
               ),
               ListTile(
                 title: Text('Fecha: ${_measurementDate.toLocal().toString().split(' ')[0]}'),
@@ -267,7 +267,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
       );
 
-      await MeasurementService().createMeasurement(widget.pregnancy, measurement);
+      await MeasurementService().createMeasurement(widget.pregnancyId, widget.currentMeasurements, measurement);
       navigator.pop();
 
     } catch (e) {

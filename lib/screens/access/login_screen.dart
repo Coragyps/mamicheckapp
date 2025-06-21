@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mamicheckapp/screens/access/register_dialog.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -116,7 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: const Icon(Icons.account_circle),
               onPressed: () {
                 _formKey.currentState?.reset();
-                Navigator.pushNamed(context, 'RegisterDialog');
+                //Navigator.pushNamed(context, 'RegisterDialog');
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterDialog(), fullscreenDialog: true));
               },
               label: const Text('Registrarse'),
             )

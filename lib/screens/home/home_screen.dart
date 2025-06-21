@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
 import 'package:mamicheckapp/models/user_model.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
-import 'package:mamicheckapp/screens/home/avatar.dart';
 import 'package:mamicheckapp/screens/home/content_screen.dart';
+import 'package:mamicheckapp/screens/home/followers_sheet.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:mamicheckapp/services/pregnancy_service.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,495 +18,178 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // int _selectedIndex = 0;
-  // late List<List<dynamic>> _pages;
   final firebaseuser = FirebaseAuth.instance.currentUser;
-
   int selectedPregnancyIndex = 0;
   String selectedPeriod = 'Ver Todo';
 
-  //     final List<Tab> _tabs = [
-  //   Tab(text: 'Resumen', icon: Icon(Icons.medical_services_outlined),),
-  //   Tab(text: 'Evolución', icon: Icon(Icons.analytics_outlined)),
-  //   Tab(text: 'Seguimiento', icon: Icon(Icons.groups_outlined)),
-  // ];
+  @override
+  Widget build(BuildContext context) {
+  // final pregnancies = context.watch<List<PregnancyModel>>();
+  // final userModel = context.watch<UserModel?>();
 
-  // final List<Widget> _pages2 = [
-  //   SummaryScreen(),
-  //   EvolutionScreen(),
-  //   Placeholder()
-  // ];
-
-  // void _changeTab(int newIndex) {
-  //   setState(() {_selectedIndex = newIndex;});
+  // if (userModel == null) {
+  //   return Scaffold(
+  //     body: Center(
+  //       child: CircularProgressIndicator(),
+  //     ),
+  //   );
   // }
 
-///override no borrar
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   _pages = [
-  //     [SummaryScreen(),'Resumen', Icon(Icons.medical_services_outlined), Icon(Icons.medical_services), 'Resumen'],
-  //     [EvolutionScreen(),'Evolución', Icon(Icons.analytics_outlined), Icon(Icons.analytics), 'Mi Evolución'],
-  //     [AccompanyScreen(),'Seguimiento', Icon(Icons.groups_outlined), Icon(Icons.groups), 'Seguimiento'],
-  //   ];
+  // if (pregnancies.isEmpty) {
+  //   return Scaffold(
+  //     body: Center(
+  //       child: Text('No hay embarazos disponibles'),
+  //     ),
+  //   );
   // }
 
-@override
-Widget build(BuildContext context) {
-  final pregnancies = context.watch<List<PregnancyModel>>();
-  final userModel = context.watch<UserModel?>();
+  // if (pregnancies.isNotEmpty) {
+  //   final rawMeasurements = pregnancies[selectedPregnancyIndex].measurements..sort((a, b) => a.date.compareTo(b.date));
+  //   final lastPeriodDate = pregnancies[selectedPregnancyIndex].lastMenstrualPeriod;
 
-  if (userModel == null) {
-    return Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
+  //   final filteredMeasurements = switch (selectedPeriod) {
+  //     'Últimos 7 Días' => rawMeasurements.where((m) => DateTime.now().difference(m.date).inDays <= 7).toList(),
+  //     'Últimos 30 Días' => rawMeasurements.where((m) => DateTime.now().difference(m.date).inDays <= 30).toList(),
+  //     '1er Trimestre' => rawMeasurements.where((m) {
+  //         final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
+  //         return week >= 0 && week <= 13;
+  //       }).toList(),
+  //     '2do Trimestre' => rawMeasurements.where((m) {
+  //         final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
+  //         return week >= 14 && week <= 27;
+  //       }).toList(),
+  //     '3er Trimestre' => rawMeasurements.where((m) {
+  //         final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
+  //         return week >= 28;
+  //       }).toList(),
+  //     _ => rawMeasurements, // 'Ver Todo' o cualquier otro
+  //   };
+  // }
 
-  if (pregnancies.isEmpty) {
-    return Scaffold(
-      body: Center(
-        child: Text('No hay embarazos disponibles'),
-      ),
-    );
-  }
+  // return Scaffold(
+  //   appBar: _buildAppBar(context),
+  //   body: ContentScreen(
+  //     pregnancy: pregnancies[selectedPregnancyIndex],
+  //     uid: userModel.uid,
+  //     firstName: userModel.firstName,
+  //     birthDate: userModel.birthDate,
+  //     selectedPeriod: selectedPeriod,
+  //     filteredMeasurements: filteredMeasurements,
+  //   ),
+  //   bottomNavigationBar: _buildBottomAppBar(context, pregnancies, userModel.uid),
+  //   floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+  //   floatingActionButton: _buildFloatingActionButton(context, pregnancies, userModel),
+  // );
 
-  final rawMeasurements = pregnancies[selectedPregnancyIndex].measurements..sort((a, b) => a.date.compareTo(b.date));
-  final lastPeriodDate = pregnancies[selectedPregnancyIndex].lastMenstrualPeriod;
+  //final pregnancies = context.watch<List<PregnancyModel>>();
+
+  // final List<PregnancyModel> pregnancies = context.watch<List<PregnancyModel>>();
+  // final UserModel? userModel = context.watch<UserModel?>();
+  // final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
+////////
+
+  final List<PregnancyModel> pregnancies = context.watch<List<PregnancyModel>>();
+  final UserModel? userModel = context.watch<UserModel?>();
+  final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
+  final now = DateTime.now();
 
   final filteredMeasurements = switch (selectedPeriod) {
-    'Últimos 7 Días' => rawMeasurements.where((m) => DateTime.now().difference(m.date).inDays <= 7).toList(),
-    'Últimos 30 Días' => rawMeasurements.where((m) => DateTime.now().difference(m.date).inDays <= 30).toList(),
-    '1er Trimestre' => rawMeasurements.where((m) {
-        final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
-        return week >= 0 && week <= 13;
-      }).toList(),
-    '2do Trimestre' => rawMeasurements.where((m) {
-        final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
-        return week >= 14 && week <= 27;
-      }).toList(),
-    '3er Trimestre' => rawMeasurements.where((m) {
-        final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
-        return week >= 28;
-      }).toList(),
-    _ => rawMeasurements, // 'Ver Todo' o cualquier otro
+    'Últimos 7 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 7).toList(),
+    'Últimos 30 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 30).toList(),
+    '1er Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 0 && week <= 13;}).toList(),
+    '2do Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 14 && week <= 27;}).toList(),
+    '3er Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 28;}).toList(),
+    _ => selectedPregnancy?.measurements,
   };
 
-  return Scaffold(
-    appBar: _buildAppBar(context),
-    body: ContentScreen(
-      pregnancy: pregnancies[selectedPregnancyIndex],
-      uid: userModel.uid,
-      firstName: userModel.firstName,
-      birthDate: userModel.birthDate,
+//////////////
+
+  // final bool isLoading = userModel == null;
+  // final bool hasPregnancies = pregnancies.isNotEmpty;
+
+  // List<MeasurementModel> filteredMeasurements = [];
+  // //DateTime? lastPeriodDate;
+
+  // if (!isLoading && hasPregnancies) {
+  //   final validIndex = selectedPregnancyIndex.clamp(0, pregnancies.length - 1);
+  //   selectedPregnancy = pregnancies[validIndex];
+  //   lastPeriodDate = selectedPregnancy.lastMenstrualPeriod;
+
+  //   final rawMeasurements = [...selectedPregnancy.measurements]..sort((a, b) => a.date.compareTo(b.date));
+  //   filteredMeasurements = _filterMeasurements(rawMeasurements, lastPeriodDate, selectedPeriod);
+  // }
+
+    return Scaffold(
+      appBar: _buildAppBar(userModel?.firstName, userModel?.lastName, userModel?.uid, userModel?.notifications),
+      bottomNavigationBar: _buildBottomAppBar(userModel?.uid, pregnancies.map((p) => p.name).toList(), selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers),
+      body: _body(selectedPregnancy, userModel?.uid, userModel?.firstName, userModel?.birthDate, selectedPregnancy?.measurements),
+      floatingActionButton: _buildFloatingActionButton(userModel?.uid, userModel?.birthDate, selectedPregnancy?.measurements, selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+    );
+  }
+
+  _body(PregnancyModel? selectedPregnancy, String? uid, String? firstName, DateTime? birthDate, List<MeasurementModel>? currentMeasurements) {
+    return selectedPregnancy != null && uid != null && firstName != null && birthDate != null && currentMeasurements != null ? ContentScreen(
+      pregnancy: selectedPregnancy,
+      uid: uid,
+      firstName: firstName,
+      birthDate: birthDate,
       selectedPeriod: selectedPeriod,
-      filteredMeasurements: filteredMeasurements,
-    ),
-    bottomNavigationBar: _buildBottomAppBar(context, pregnancies, userModel.uid),
-    floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-    floatingActionButton: _buildFloatingActionButton(context, pregnancies, userModel),
-  );
-}
-
-
-///ereal
-  // @override
-  // Widget build(BuildContext context) {
-  //   final pregnancies = context.watch<List<PregnancyModel>>();
-  //   final userModel = context.watch<UserModel?>();
-
-  //     if (userModel == null) {
-  //   return Center(child: CircularProgressIndicator());
-  // }
+      filteredMeasurements: currentMeasurements,
+    ) : Center(child: CircularProgressIndicator());
     
-  // if (pregnancies.isEmpty) {
-  //   return Center(child: Text('No hay embarazos disponibles.'));
-  // }
+    // Padding(
+    //   padding: const EdgeInsets.all(16),
+    //   child: Column(
+    //     spacing: 15,
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     children: [
+    //       _suggestionCard(
+    //         title: '¿Tienes un embarazo activo?',
+    //         description: 'Has seguimiento continuo a tu salud registrando tus datos.',
+    //         button: FilledButton.icon(
+    //           icon: const Icon(Icons.playlist_add),
+    //           label: const Text('Registrar mi Embarazo'),
+    //           onPressed: () {
+    //             Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: uid!, firstName: firstName!, birthDate: birthDate!));
+    //           },
+    //         )
+    //       ),
+    //       _suggestionCard(
+    //         title: '¿Buscas monitorear un embarazo?',
+    //         description: 'Utiliza el código que te compartió la gestante.',
+    //         button: FilledButton.icon(
+    //           icon: const Icon(Icons.open_in_new),
+    //           label: const Text('Ir a Notificaciones'),
+    //           onPressed: () {Navigator.pushNamed(context, 'NotificationScreen');},
+    //         )
+    //       ),
+    //     ],
+    //   ),
+    // );
+    
+  }
 
-  //   return Scaffold(
-  //     appBar: _titlebar(context),
-  //     body: ContentScreen(pregnancy: pregnancies[selectedPregnancyIndex], uid: userModel.uid, firstName: userModel.firstName, birthDate: userModel.birthDate, selectedPeriod: selectedPeriod,),
-///eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-  //     bottomNavigationBar: BottomAppBar(
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.start,
-  //         children: [
-  //           MenuAnchor(
-  //             builder: (context, controller, _) {
-  //               return ElevatedButton.icon(
-  //                 icon: controller.isOpen ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
-  //                 label: Text('Embarazo'),
-  //                 onPressed: controller.isOpen ? controller.close : controller.open,
-  //               );
-  //             },
-  //             menuChildren: [
-  //               for (int i = 0; i < pregnancies.length; i++) 
-  //               MenuItemButton(
-  //                 leadingIcon: pregnancies[i].followers[firebaseuser!.uid] == "owner" && pregnancies[i].isActive ? Icon(Icons.bookmark) : null,
-  //                 onPressed: () {
-  //                   setState(() {
-  //                     selectedPregnancyIndex = i;
-  //                   });
-  //                 },
-  //                 child: Text(pregnancies[i].name),
-  //               ),
-  //             ],
-  //           ),
-
-  /////////////////////////////////////////////////////////////
-  //           PopupMenuButton<int>(
-  //             icon: Icon(Icons.access_time),
-  //             onSelected: (int newPeriod) {
-  //               setState(() {
-  //                 selectedPeriod = newPeriod;
-  //               });
-  //             },
-  //             itemBuilder: (context) => <PopupMenuEntry<int>>[
-  //               PopupMenuItem(
-  //                 value: null,
-  //                 child: Text('Todo'),
-  //               ),
-  //               PopupMenuItem(
-  //                 value: 7,
-  //                 child: Text('Últimos 7 días'),
-  //               ),
-  //               PopupMenuItem(
-  //                 value: 2,
-  //                 child: Text('Últimas 2 semanas'),
-  //               ),
-  //               PopupMenuItem(
-  //                 value: 30,
-  //                 child: Text('Último mes'),
-  //               ),
-  //               PopupMenuItem(
-  //                 value: 60,
-  //                 child: Text('Últimos 2 meses'),
-  //               ),
-  //               PopupMenuItem(
-  //                 value: 140,
-  //                 child: Text('A las 20 semanas'),
-  //               ),
-  //             ],
-  //           ),
-  //           IconButton(
-  //             icon: Icon(Icons.share_outlined),
-  //             onPressed: () {
-  //               showDialog(
-  //                 context: context,
-  //                 builder: (_) => const AlertDialog(
-  //                   title: Text('No se puede registrar'),
-  //                   content: Text('Debes tener un embarazo propio para guardar tus mediciones.'),
-  //                 ),
-  //               );
-  //             },
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-/////eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-  //     floatingActionButtonLocation:FloatingActionButtonLocation.endDocked,
-  //     floatingActionButton: FloatingActionButton(
-  //       onPressed: () {
-  //         if (pregnancies[0].followers[firebaseuser!.uid] == 'owner' && pregnancies[0].isActive) {
-  //           Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: pregnancies[0], birthDate: userModel.birthDate),
-  //           );
-  //         } else {
-  //           showDialog(
-  //             context: context,
-  //             builder: (_) => const AlertDialog(
-  //               title: Text('No se puede registrar'),
-  //               content: Text('Debes tener un embarazo propio para guardar tus mediciones.'),
-  //             ),
-  //           );
-  //         }
-  //       },
-  //       child: const Icon(Icons.create_outlined),
-  //     ),
-  //   );
-  // }
-
-  PreferredSizeWidget _titlebar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(String? firstName, String? lastName, String? uid, List<Map<String, dynamic>>? notifications) {
     return AppBar(
       forceMaterialTransparency: true,
-      title: Row(
-        children: [
-          Text('$selectedPregnancyIndex', style: TextStyle(fontFamily: 'Caveat', fontSize: 22, fontWeight: FontWeight.bold , color: Color(0xffCA3E7F))),
-        ],
-      ),
       leading: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Image(image: AssetImage('assets/img/logo.png')),
+        padding: const EdgeInsets.all(8.0),
+        child: Image(image: AssetImage('assets/img/logo.png'), fit: BoxFit.contain)
       ),
+      title: Text('Mamicheck', style: TextStyle(fontFamily: 'Caveat', color: Color(0xffCA3E7F))),
       actions: [
         IconButton(
-          tooltip: 'Notificaciones',
-          onPressed: () {
-            Navigator.pushNamed(context, 'NotificationScreen');
-          }, 
-          icon: const Icon(Icons.notifications_outlined)
+          onPressed: () {Navigator.pushNamed(context, 'NotificationScreen');},
+          icon: notifications != null ? Badge.count(
+            isLabelVisible: notifications.isNotEmpty,
+            count: notifications.length,
+            child: notifications.isNotEmpty ? Icon(Icons.notifications) : Icon(Icons.notifications_outlined),
+          ) : Icon(Icons.notifications_outlined)
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: PopupMenuButton<String>(
-            tooltip: 'Menú de Opciones',
-            onSelected: (String value) {
-              final messenger = ScaffoldMessenger.of(context);
-
-              switch (value) {
-                case 'profile':
-                  Navigator.pushNamed(context, 'ProfileScreen');
-                  break;
-                case 'config':
-                  Navigator.pushNamed(context, 'SettingsScreen');
-                  break;
-                case 'api':
-                  Navigator.pushNamed(context, 'APITest');
-                  break;
-                case 'help':
-                  Navigator.pushNamed(context, 'HelpScreen');
-                  break;
-                case 'signout':
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext dialogContext) {
-                      final dialognavigator = Navigator.of(dialogContext);
-                      return AlertDialog(
-                        title: const Text('¿Deseas cerrar sesión?'),
-                        content: const Text('Si continuas, se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.\n\nTendrás que volver a acceder para usar el resto de funciones.'),
-                        actions: [
-                          ElevatedButton(
-                            child: const Text('No, Gracias'),
-                            onPressed: () {
-                              dialognavigator.pop();
-                            },
-                          ),
-                          TextButton(
-                            child: const Text('Acepto'),
-                            onPressed: () async {
-                              dialognavigator.pop();
-                              await Future.delayed(Duration.zero);
-                              await AuthService().signout();                              
-                            },
-                          )
-                        ], 
-                      );
-                    }
-                  );
-                  break;                
-                default:
-                  messenger.showSnackBar(
-                    SnackBar(content: Text('¡Acción "$value" no existe!'))
-                  );
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(value: 'profile', child: Row(
-                children: [Icon(Icons.person_outline), SizedBox(width: 8,), Text('Mi Perfil')],
-              )),
-              const PopupMenuItem<String>(value: 'config', child: Row(
-                children: [Icon(Icons.settings_outlined), SizedBox(width: 8,), Text('Configuración')],
-              )),
-              const PopupMenuDivider(),
-              const PopupMenuItem<String>(value: 'help', child: Row(
-                children: [Icon(Icons.help_outline), SizedBox(width: 8,), Text('Ayuda')],
-              )),
-              const PopupMenuItem<String>(value: 'signout', child: Row(
-                children: [Icon(Icons.logout), SizedBox(width: 8,), Text('Cerrar Sesión')],
-              )),
-            ],
-            child: Avatar(),
-          ),
-        )
-      ],
-    );
-  }
-
-
-  // Widget _body(BuildContext context) {
-  //   // return IndexedStack(
-  //   //   index: _selectedIndex,
-  //   //   children: _pages.map((item) => item[0] as Widget).toList(),
-  //   // );
-  //   return ContentScreen();
-  // } 
-
-  // Widget _body(BuildContext context) {
-  //   return TabBarView(
-  //     children: _pages2
-  //   );
-  // } 
-
-///este es el ultimo no borrar
-  // Widget _navbar(BuildContext context) {
-  //   return NavigationBar(
-  //     selectedIndex: _selectedIndex,
-  //     onDestinationSelected: (index) {
-  //       if (_selectedIndex != index) {
-  //         setState(() => _selectedIndex = index);
-  //       }
-  //     },
-  //     destinations: _pages.map((item) => NavigationDestination(icon: item[2], selectedIcon: item[3], label: item[1])).toList(),
-  //   );
-  // }
-  /// aqui acaba
-
-  // Widget _fab(BuildContext context) {
-  //   return FloatingActionButton(
-  //     onPressed: () {
-  //       showModalBottomSheet(
-  //         context: context,
-  //         isScrollControlled: true,
-  //         //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
-  //         builder: (context) {
-  //           return DraggableScrollableSheet(
-  //             expand: false,
-  //               maxChildSize: 0.9, // Esto da un valor entre 0 y 1
-  //             builder: (context, scrollController) {
-  //               return MeasurementSheet(scrollController: scrollController);
-  //             },
-  //           );
-  //         }
-  //       );
-  //     },
-  //     child: const Icon(Icons.add),
-  //   );
-  // }
-
-  // Widget _fab(BuildContext context) {
-  //   final userModel = context.watch<UserModel?>();
-  //   if (userModel == null) return const SizedBox.shrink();
-  //   return FloatingActionButton(
-
-  //     onPressed: () {
-  //       final allPregnancies = context.read<List<PregnancyModel>>();
-  //       final userModel = context.read<UserModel>();
-        
-  //       final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
-
-  //       if (activePregnancy != null) {
-  //         Navigator.pushNamed(
-  //           context,
-  //           'MeasurementDialog',
-  //           arguments: MeasurementDialogArguments(pregnancy: activePregnancy, birthDate: userModel.birthDate),
-  //         );
-  //       } else {
-  //         showDialog(
-  //           context: context,
-  //           builder: (_) => const AlertDialog(
-  //             title: Text('No se puede registrar'),
-  //             content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
-  //           ),
-  //         );
-  //       }
-        
-  //     },
-  //     child: const Icon(Icons.addchart_outlined),
-  //   );
-  // }
-
-  Widget _navbar(BuildContext context, List<PregnancyModel> pregnancies, int selectedPregnancyIndex, String uid) {
-    return BottomAppBar(
-      child: MenuAnchor(
-        builder: (context, controller, _) {
-          return OutlinedButton.icon(
-            icon: Icon(Icons.child_care),
-            label: Text('Seleccionar Embarazo'),
-            //label: Text(pregnancies[selectedPregnancyIndex].name),
-            onPressed: controller.open,
-          );
-        },
-        menuChildren: [
-          for (int i = 0; i < pregnancies.length; i++) 
-          MenuItemButton(
-            leadingIcon: pregnancies[i].followers[uid] == "owner" ? Icon(Icons.person) : null,
-            onPressed: () {
-              setState(() {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Medición guardada sin cálculo de riesgo.'),
-                  backgroundColor: Colors.blue,
-                ));
-                selectedPregnancyIndex = i;
-              });
-            },
-            child: Text(pregnancies[i].name),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _fab(BuildContext context, List<PregnancyModel> pregnancies, int selectedPregnancyIndex, String uid) {
-    final userModel = context.watch<UserModel?>();
-    if (userModel == null) return const SizedBox.shrink();
-
-    return FloatingActionButton(
-      onPressed: () {
-        if (pregnancies[selectedPregnancyIndex].followers[uid] == 'owner' && pregnancies[selectedPregnancyIndex].isActive) {
-          Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: pregnancies[selectedPregnancyIndex], birthDate: userModel.birthDate),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (_) => const AlertDialog(
-              title: Text('No se puede registrar'),
-              content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
-            ),
-          );
-        }
-      },
-      child: const Icon(Icons.add),
-    );
-  }
-
-  // Widget _fab(BuildContext context) {
-  //   return FloatingActionButton(
-  //     onPressed: () {
-  //       showModalBottomSheet(
-  //         context: context,
-  //         isScrollControlled: true,
-  //         //shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
-  //         builder: (context) {
-  //           return DraggableScrollableSheet(
-  //             expand: false,
-  //               maxChildSize: 0.9, // Esto da un valor entre 0 y 1
-  //             builder: (context, scrollController) {
-  //               return MeasurementSheet(scrollController: scrollController);
-  //             },
-  //           );
-  //         }
-  //       );
-  //     },
-  //     child: const Icon(Icons.add),
-  //   );
-  // }
-
-
-PreferredSizeWidget _buildAppBar(BuildContext context) {
-  return AppBar(
-    forceMaterialTransparency: true,
-    leading: Padding(
-      padding: EdgeInsets.all(8),
-      child: Image(image: AssetImage('assets/img/logo.png'),fit: BoxFit.contain)
-    ),
-    title: Text('Mamicheck', style: TextStyle(fontFamily: 'Caveat', color: Color(0xffCA3E7F))),
-    actions: [
-      IconButton(
-        tooltip: 'Notificaciones',
-        onPressed: () {
-          Navigator.pushNamed(context, 'NotificationScreen');
-        }, 
-        icon: const Icon(Icons.notifications_outlined)
-      ),
-      Padding(
-        padding: const EdgeInsets.only(right: 12),
-        child: PopupMenuButton<String>(
-          tooltip: 'Menú de Opciones',
+        PopupMenuButton<String>(
           onSelected: (String value) {
             final messenger = ScaffoldMessenger.of(context);
-
             switch (value) {
               case 'profile':
                 Navigator.pushNamed(context, 'ProfileScreen');
@@ -527,7 +212,7 @@ PreferredSizeWidget _buildAppBar(BuildContext context) {
                       title: const Text('¿Deseas cerrar sesión?'),
                       content: const Text('Si continuas, se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.\n\nTendrás que volver a acceder para usar el resto de funciones.'),
                       actions: [
-                        ElevatedButton(
+                        FilledButton(
                           child: const Text('No, Gracias'),
                           onPressed: () {
                             dialognavigator.pop();
@@ -563,113 +248,263 @@ PreferredSizeWidget _buildAppBar(BuildContext context) {
             const PopupMenuItem<String>(value: 'help', child: Row(
               children: [Icon(Icons.help_outline), SizedBox(width: 8,), Text('Ayuda')],
             )),
+            const PopupMenuDivider(),
             const PopupMenuItem<String>(value: 'signout', child: Row(
-              children: [Icon(Icons.logout), SizedBox(width: 8,), Text('Cerrar Sesión')],
+              children: [Icon(Icons.logout, color: Color.fromRGBO(183, 28, 28, 1)), SizedBox(width: 8,), Text('Cerrar Sesión', style: TextStyle(color: Color.fromRGBO(183, 28, 28, 1)))],
             )),
           ],
-          child: Avatar(),
-        ),
-      )
-    ],
-  );
-}
+          icon: firstName != null && lastName != null && uid != null ? CircleAvatar(
+            backgroundColor: Colors.primaries[uid.hashCode.abs() % Colors.primaries.length].shade900,
+            child: Text(firstName[0].toUpperCase() + lastName[0].toUpperCase(), style: TextStyle(color: Colors.primaries[uid.hashCode.abs() % Colors.primaries.length].shade100)),
+          ) : CircleAvatar(backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest)
+        )
+      ],
+    );
+  }
 
-Widget _buildBottomAppBar(BuildContext context, List<PregnancyModel> pregnancies, String uid) {
-final periodOptions = [
-  'Ver Todo',
-  'Últimos 7 Días',
-  'Últimos 30 Días',
-  '1er Trimestre',
-  '2do Trimestre',
-  '3er Trimestre',
-];
-
-  return BottomAppBar(
-    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-    child: Row(
-      children: [
-        MenuAnchor(
-          builder: (context, controller, _) {
-            return ElevatedButton.icon(
-              icon: controller.isOpen ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
-              label: Text('Monitorear'),
-              onPressed: controller.isOpen ? controller.close : controller.open,
-            );
-          },
-          menuChildren: [
-            for (int i = 0; i < pregnancies.length; i++) 
-            MenuItemButton(
-              leadingIcon: pregnancies[i].followers[firebaseuser!.uid] == "owner" && pregnancies[i].isActive ? Icon(Icons.bookmark) : null,
-              onPressed: () {
-                setState(() {
-                  selectedPregnancyIndex = i;
-                });
+  Widget _buildBottomAppBar(String? uid, List<String>? pregnancyNames, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers) {
+    return BottomAppBar(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: Row(
+        children: pregnancyNames!.isNotEmpty ? [
+            MenuAnchor(
+              builder: (context, controller, _) {
+                return ElevatedButton.icon(
+                  icon: controller.isOpen ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
+                  label: Text('Monitorear'),
+                  onPressed: controller.isOpen ? controller.close : controller.open,
+                );
               },
-              child: Text(pregnancies[i].name),
+              menuChildren: [
+                for (int i = 0; i < pregnancyNames!.length; i++) 
+                MenuItemButton(
+                  leadingIcon: selectedPregnancyIndex == i ? Icon(Icons.remove_red_eye) : null,
+                  onPressed: () {
+                    final messenger = ScaffoldMessenger.of(context);
+                    setState(() {
+                      selectedPregnancyIndex = i;
+                    });
+                    messenger.showSnackBar(SnackBar(content: Text('Mostrando ${pregnancyNames[i]}')));
+                  },
+                  child: Text(pregnancyNames[i]),
+                ),
+              ],
             ),
+            PopupMenuButton<String>(
+              icon: Icon(Icons.access_time),
+              onSelected: (String newPeriod) {
+                final messenger = ScaffoldMessenger.of(context);
+                setState(() {
+                  selectedPeriod = newPeriod;
+                });
+                messenger.showSnackBar(SnackBar(content: Text('Mostrando resultados de $selectedPeriod')));
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(value: 'Ver Todo', child: Row(
+                  children: [
+                    if (selectedPeriod == 'Ver Todo') ...[Icon(Icons.access_time_filled), SizedBox(width: 8)], Text('Ver Todo')
+                  ],
+                )),
+                PopupMenuItem<String>(value: 'Últimos 7 Días', child: Row(
+                  children: [
+                    if (selectedPeriod == 'Últimos 7 Días') ...[Icon(Icons.access_time_filled), SizedBox(width: 8)], Text('Últimos 7 Días')
+                  ],
+                )),
+                PopupMenuItem<String>(value: 'Últimos 30 Días', child: Row(
+                  children: [
+                    if (selectedPeriod == 'Últimos 30 Días') ...[Icon(Icons.access_time_filled), SizedBox(width: 8)], Text('Últimos 30 Días')
+                  ],
+                )),
+                const PopupMenuDivider(),
+                PopupMenuItem<String>(value: '1er Trimestre', child: Row(
+                  children: [
+                    if (selectedPeriod == '1er Trimestre') ...[Icon(Icons.access_time_filled), SizedBox(width: 8)], Text('1er Trimestre')
+                  ],
+                )),
+                PopupMenuItem<String>(value: '2do Trimestre', child: Row(
+                  children: [
+                    if (selectedPeriod == '2do Trimestre') ...[Icon(Icons.access_time_filled), SizedBox(width: 8)], Text('2do Trimestre')
+                  ],
+                )),
+                PopupMenuItem<String>(value: '3er Trimestre', child: Row(
+                  children: [
+                    if (selectedPeriod == '3er Trimestre') ...[Icon(Icons.access_time_filled), SizedBox(width: 8)], Text('3er Trimestre')
+                  ],
+                )),
+              ]
+            ),
+            PopupMenuButton(
+              icon: Icon(Icons.share_outlined),
+              onSelected: (String value) {
+                final messenger = ScaffoldMessenger.of(context);
+                switch (value) {
+                  case 'Invitar':
+                    Navigator.pushNamed(context, 'ProfileScreen');
+                    break;
+                  case 'Seguidores':
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) {
+                        return DraggableScrollableSheet(
+                          expand: false,
+                          maxChildSize: 0.9,
+                          builder: (context, scrollController) {
+                            return FollowersSheet(
+                              scrollController: scrollController,
+                              pregnancyId: pregnancyId!,
+                              followers: pregnancyFollowers!
+                            );
+                          }
+                        );
+                      },
+                    );
+                    break;
+                  case 'Ver Mediciones':
+                    Navigator.pushNamed(context, 'MeasurementsScreen', arguments: MeasurementsScreenArguments(pregnancyId: pregnancyId!));
+                    break;
+                  case 'Exportar a PDF':
+                    Navigator.pushNamed(context, 'HelpScreen');
+                    break;
+                  case 'Archivar':
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext dialogContext) {
+                        final dialognavigator = Navigator.of(dialogContext);
+                        return AlertDialog(
+                          title: const Text('¿Dejar de monitorear este Embarazo?'),
+                          content: const Text('Si continuas, no se podra volver a añadir mediciones a este embarazo y se marcara como archivado'),
+                          actions: [
+                            FilledButton(
+                              child: const Text('No, Gracias'),
+                              onPressed: () {
+                                dialognavigator.pop();
+                              },
+                            ),
+                            TextButton(
+                              child: const Text('Acepto'),
+                              onPressed: () async {
+                                await PregnancyService().deactivatePregnancy(pregnancyId!);
+                                messenger.showSnackBar(SnackBar(content: Text('${pregnancyNames[selectedPregnancyIndex]} se marco como inactivo')));
+                                dialognavigator.pop();                      
+                              },
+                            )
+                          ],
+                        );
+                      }
+                    );
+                    break;                
+                  default: messenger.showSnackBar(SnackBar(content: Text('¡Acción "$value" no existe!')));
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(value: 'Invitar', child: Row(
+                  children: [Icon(Icons.person_add_outlined), SizedBox(width: 8,), Text('Invitar')],
+                )),
+                const PopupMenuItem<String>(value: 'Seguidores', child: Row(
+                  children: [Icon(Icons.people_outlined), SizedBox(width: 8,), Text('Seguidores')],
+                )),
+                const PopupMenuDivider(),
+                const PopupMenuItem<String>(value: 'Ver Mediciones', child: Row(
+                  children: [Icon(Icons.view_list_outlined), SizedBox(width: 8,), Text('Ver Mediciones')],
+                )),
+                const PopupMenuItem<String>(value: 'Exportar a PDF', child: Row(
+                  children: [Icon(Icons.task_outlined), SizedBox(width: 8,), Text('Exportar a PDF')],
+                )),
+                if (pregnancyIsActive! && pregnancyFollowers![uid] == 'owner') ...[
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(value: 'Archivar', child: Row(
+                    children: [Icon(Icons.archive_outlined, color: Color.fromRGBO(183, 28, 28, 1)), SizedBox(width: 8,), Text('Archivar', style: TextStyle(color: Color.fromRGBO(183, 28, 28, 1)))],
+                  ))
+                ]
+              ],
+            )
+        ] : [
+          ElevatedButton(
+            onPressed: () {Navigator.pushNamed(context, 'HelpScreen');},
+            child: Text('¿Necesitas Ayuda?'),
+          )
+        ]
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton(String? uid, DateTime? birthDate, List<MeasurementModel>? currentMeasurements, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers) {
+    if (birthDate != null && pregnancyId != null && currentMeasurements != null) {
+      return pregnancyIsActive == true && pregnancyFollowers?[uid] == 'owner' ? FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, 'MeasurementDialog', arguments: MeasurementDialogArguments(birthDate: birthDate, currentMeasurements: currentMeasurements, pregnancyId: pregnancyId));
+        },
+        child: const Icon(Icons.edit),
+      ) : SizedBox.shrink();
+    } else {return SizedBox.shrink();}
+    // return FloatingActionButton(
+    //   onPressed: () {
+    //     Navigator.pushNamed(context, 'MeasurementDialog', arguments: MeasurementDialogArguments(pregnancy: pregnancies![selectedPregnancyIndex], birthDate: userModel!.birthDate));
+    //   },
+
+    //   // onPressed: pregnancies?[selectedPregnancyIndex].followers[userModel?.uid] == 'owner' ? () {
+    //   //   Navigator.pushNamed(
+    //   //     context,
+    //   //     'MeasurementDialog',
+    //   //     arguments: MeasurementDialogArguments(
+    //   //       pregnancy: pregnancies![selectedPregnancyIndex],
+    //   //       birthDate: userModel!.birthDate,
+    //   //     ),
+    //   //   );
+    //   // } : () {
+    //   //   showDialog(
+    //   //     context: context,
+    //   //     builder: (dialogContext) {
+    //   //       final dialogNavigator = Navigator.of(dialogContext);
+    //   //       return AlertDialog(
+    //   //         title: const Text('¿Registrar Embarazo?'),
+    //   //         content: const Text(
+    //   //             'Debes tener un embarazo propio para guardar tus mediciones'),
+    //   //         actions: [
+    //   //           TextButton(
+    //   //             child: const Text('No, Gracias'),
+    //   //             onPressed: () => dialogNavigator.pop(),
+    //   //           ),
+    //   //           FilledButton(
+    //   //             child: const Text('Registrar Embarazo'),
+    //   //             onPressed: () async => dialogNavigator.pop(),
+    //   //           ),
+    //   //         ],
+    //   //       );
+    //   //     },
+    //   //   );
+    //   // },
+    //   child: const Icon(Icons.edit),
+    // ) : SizedBox.shrink();
+  }
+
+  Widget _suggestionCard({required String title, required String description, required FilledButton button}) {
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      //margin: const EdgeInsets.only(bottom: 48),
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, size: 32, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 22),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                  const SizedBox(height: 4),
+                  Text(description),
+                  const SizedBox(height: 8),
+                  button
+                ],
+              ),
+            )
           ],
         ),
-        PopupMenuButton<String>(
-          icon: Icon(Icons.access_time),
-          onSelected: (String newPeriod) {
-            setState(() {
-              selectedPeriod = newPeriod;
-            });
-          },
-itemBuilder: (context) => periodOptions.map((label) {
-  return PopupMenuItem(
-    value: label,
-    child: Row(
-      children: [
-        if (selectedPeriod == label) ...[
-          Icon(Icons.access_time_filled),
-          SizedBox(width: 8),
-        ],
-        Text(label),
-      ],
-    ),
-  );
-}).toList(),
-        ),
-        IconButton(
-          icon: Icon(Icons.share_outlined),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (_) => const AlertDialog(
-                title: Text('No se puede registrar'),
-                content: Text('Debes tener un embarazo propio para guardar tus mediciones.'),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildFloatingActionButton(BuildContext context, List<PregnancyModel> pregnancies, UserModel userModel) {
-  return FloatingActionButton(
-    onPressed: () {
-      if (pregnancies[0].followers[userModel.uid] == 'owner') {
-        Navigator.pushNamed(
-          context,'MeasurementDialog',
-          arguments: MeasurementDialogArguments(
-            pregnancy: pregnancies[0],
-            birthDate: userModel.birthDate,
-          ),
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('No se puede registrar'),
-            content: Text('Debes tener un embarazo propio para guardar tus mediciones'),
-          ),
-        );
-      }
-    },
-    child: Icon(Icons.create_outlined),
-  );
-}
+      ),
+    );
+  }
 }

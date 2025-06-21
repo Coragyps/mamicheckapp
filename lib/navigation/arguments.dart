@@ -1,13 +1,14 @@
-import 'package:mamicheckapp/models/pregnancy_model.dart';
+import 'package:mamicheckapp/models/measurement_model.dart';
 
 class MyHomePageArguments {
   final String title;
   MyHomePageArguments({required this.title});
 }
 class MeasurementDialogArguments{
-  final PregnancyModel pregnancy;
+  final String pregnancyId;
+  final List<MeasurementModel> currentMeasurements;
   final DateTime birthDate;
-  MeasurementDialogArguments({required this.pregnancy, required this.birthDate});
+  MeasurementDialogArguments({required this.birthDate, required this.currentMeasurements, required this.pregnancyId});
 }
 class PregnancyDialogArguments{
   final String uid;

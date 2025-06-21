@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
-import 'package:mamicheckapp/models/user_model.dart';
-import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:mamicheckapp/screens/form/measurement_sheet.dart';
 import 'package:provider/provider.dart';
 
@@ -130,7 +128,7 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
       return Scaffold(
         appBar: AppBar(title: const Text('Tabla de Mediciones')),
         body: _body(measurements),
-        floatingActionButton: _fab(context,pregnancy.id),
+        //floatingActionButton: _fab(context,pregnancy.id),
       );
   }
 
@@ -263,50 +261,50 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
     return Text('${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}\n${date.day}/${date.month}/${date.year}');
   }
 
-  Widget _fab(BuildContext context, String pregnancyId) {
-    final userModel = context.watch<UserModel?>();
-    final activePregnancy = context.watch<List<PregnancyModel>>().firstOrNull;
-    //final allPregnancies = context.watch<List<PregnancyModel>>();
-    if (userModel == null) return const SizedBox.shrink();
+  // Widget _fab(BuildContext context, String pregnancyId) {
+  //   final userModel = context.watch<UserModel?>();
+  //   final activePregnancy = context.watch<List<PregnancyModel>>().firstOrNull;
+  //   //final allPregnancies = context.watch<List<PregnancyModel>>();
+  //   if (userModel == null) return const SizedBox.shrink();
 
-    //final activePregnancy = allPregnancies.firstOrNull;
-    //final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
-    return FloatingActionButton(
-      onPressed: () {
-        if (activePregnancy != null && activePregnancy.followers[userModel.uid] == 'owner' && activePregnancy.isActive) {
-          Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate));
-          // if (activePregnancy.id != pregnancyId) {
-          //   showDialog(
-          //     context: context, 
-          //     builder: (_) => AlertDialog(
-          //       title: Text('No tienes acceso a este Embarazo'),
-          //       content: Text('Unicamente puedes registrar mediciones en tu propio embarazo que este activo'),
-          //       actions: [
-          //         ElevatedButton(
-          //           child: const Text('OK'),
-          //           onPressed: () async {
-          //             Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate));                            
-          //           },
-          //         )
-          //       ], 
-          //     ),
-          //   );
-          // } else {
-          //   Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate));
-          // }
-        } else {
-          showDialog(
-            context: context,
-            builder: (_) => const AlertDialog(
-              title: Text('No se puede registrar'),
-              content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
-            ),
-          );
-        }
-      },
-      child: const Icon(Icons.add),
-    );
-  }
+  //   //final activePregnancy = allPregnancies.firstOrNull;
+  //   //final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
+  //   return FloatingActionButton(
+  //     onPressed: () {
+  //       if (activePregnancy != null && activePregnancy.followers[userModel.uid] == 'owner' && activePregnancy.isActive) {
+  //         Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate));
+  //         // if (activePregnancy.id != pregnancyId) {
+  //         //   showDialog(
+  //         //     context: context, 
+  //         //     builder: (_) => AlertDialog(
+  //         //       title: Text('No tienes acceso a este Embarazo'),
+  //         //       content: Text('Unicamente puedes registrar mediciones en tu propio embarazo que este activo'),
+  //         //       actions: [
+  //         //         ElevatedButton(
+  //         //           child: const Text('OK'),
+  //         //           onPressed: () async {
+  //         //             Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate));                            
+  //         //           },
+  //         //         )
+  //         //       ], 
+  //         //     ),
+  //         //   );
+  //         // } else {
+  //         //   Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate));
+  //         // }
+  //       } else {
+  //         showDialog(
+  //           context: context,
+  //           builder: (_) => const AlertDialog(
+  //             title: Text('No se puede registrar'),
+  //             content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
+  //           ),
+  //         );
+  //       }
+  //     },
+  //     child: const Icon(Icons.add),
+  //   );
+  // }
 
   // DataCell _riskCell(int? level) {
   //   switch (level) {

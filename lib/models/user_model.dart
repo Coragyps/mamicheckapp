@@ -8,6 +8,7 @@ class UserModel {
   final DateTime birthDate;
   final String telephoneNumber;
   final bool isPregnant;
+  final List<Map<String, dynamic>> notifications;
 
   UserModel({
     required this.uid,
@@ -17,6 +18,7 @@ class UserModel {
     required this.birthDate,
     required this.telephoneNumber,
     required this.isPregnant,
+    required this.notifications,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -29,6 +31,7 @@ class UserModel {
       birthDate: data['birthDate']?.toDate() ?? DateTime.now(),
       telephoneNumber: data['telephoneNumber'] ?? '???',
       isPregnant: data['isPregnant'] ?? true,
+      notifications: List<Map<String, dynamic>>.from(data['notifications'] ?? [])
     );
   }
 
@@ -40,6 +43,7 @@ class UserModel {
       'birthDate': Timestamp.fromDate(birthDate),
       'telephoneNumber': telephoneNumber,
       'isPregnant': isPregnant,
+      'notifications': notifications,
     };
   }
 }

@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
-import 'package:mamicheckapp/models/user_model.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:provider/provider.dart';
 
@@ -103,38 +102,38 @@ class _EvolutionScreenState extends State<EvolutionScreen> {
 ),
 
 
-floatingActionButton: _fab(context),
+//floatingActionButton: _fab(context),
 
     );
   }
 
 
-  Widget _fab(BuildContext context) {
-    final userModel = context.watch<UserModel?>();
-    final activePregnancy = context.watch<List<PregnancyModel>>().firstOrNull;
-    //final allPregnancies = context.watch<List<PregnancyModel>>();
-    if (userModel == null) return const SizedBox.shrink();
+  // Widget _fab(BuildContext context) {
+  //   final userModel = context.watch<UserModel?>();
+  //   //final activePregnancy = context.watch<List<PregnancyModel>>().firstOrNull;
+  //   //final allPregnancies = context.watch<List<PregnancyModel>>();
+  //   if (userModel == null) return const SizedBox.shrink();
 
-    //final activePregnancy = allPregnancies.firstOrNull;
-    //final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
-    return FloatingActionButton(
-      onPressed: () {
-        if (activePregnancy != null && activePregnancy.followers[userModel.uid] == 'owner' && activePregnancy.isActive) {
-          Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (_) => const AlertDialog(
-              title: Text('No se puede registrar'),
-              content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
-            ),
-          );
-        }
-      },
-      child: const Icon(Icons.add),
-    );
-  }
+  //   //final activePregnancy = allPregnancies.firstOrNull;
+  //   //final activePregnancy = allPregnancies.firstWhereOrNull((p) => p.followers[userModel.uid] == 'owner' && p.isActive);
+  //   // return FloatingActionButton(
+  //   //   onPressed: () {
+  //   //     if (activePregnancy != null && activePregnancy.followers[userModel.uid] == 'owner' && activePregnancy.isActive) {
+  //   //       Navigator.pushNamed(context,'MeasurementDialog',arguments: MeasurementDialogArguments(pregnancy: activePregnancy,birthDate: userModel.birthDate),
+  //   //       );
+  //   //     } else {
+  //   //       showDialog(
+  //   //         context: context,
+  //   //         builder: (_) => const AlertDialog(
+  //   //           title: Text('No se puede registrar'),
+  //   //           content: Text('Debes tener un embarazo activo para registrar mediciones rutinarias.'),
+  //   //         ),
+  //   //       );
+  //   //     }
+  //   //   },
+  //   //   child: const Icon(Icons.add),
+  //   // );
+  // }
 
   Widget _buildChartCard(List<MeasurementModel> measurements, String pregnancyId) {
     final hasData = measurements.isNotEmpty;

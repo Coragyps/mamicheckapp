@@ -42,9 +42,6 @@ class AppRouting {
           builder: (_) => const RegisterDialog(),
         );
 
-      // case 'MeasurementsScreen':
-      //   return MaterialPageRoute(builder: (_) => MeasurementsScreen());
-
       case 'MeasurementsScreen':
         final args = settings.arguments as MeasurementsScreenArguments;
         return MaterialPageRoute(builder: (_) => MeasurementsScreen(pregnancyId: args.pregnancyId));
@@ -56,13 +53,13 @@ class AppRouting {
         final args = settings.arguments as MyHomePageArguments;
         return MaterialPageRoute(
           builder: (_) => MyHomePage(title: args.title),
-        );
+        ); 
 
       case 'MeasurementDialog':
         final args = settings.arguments as MeasurementDialogArguments;
         return MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (_) => MeasurementDialog(pregnancy: args.pregnancy, birthDate: args.birthDate,), 
+          builder: (_) => MeasurementDialog(birthDate: args.birthDate, pregnancyId: args.pregnancyId, currentMeasurements: args.currentMeasurements), 
         );
 
       case 'PregnancyDialog':

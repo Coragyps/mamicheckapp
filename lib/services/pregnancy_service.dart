@@ -40,6 +40,7 @@ class PregnancyService {
     return allDocs.map((doc) => PregnancyModel.fromFirestore(doc)).toList();
   }
 
+/// estos
   Future<void> addFollower(String pregnancyId, String uid) async {
     final docRef = FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId);
     await docRef.update({'followers.$uid': 'companion'});
@@ -49,19 +50,6 @@ class PregnancyService {
     final docRef = FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId);
     await docRef.update({'followers.$uid': FieldValue.delete()});
   }
-
-  // Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {
-  //   return _db
-  //       .collection('pregnancies')
-  //       .where('followers', arrayContains: uid)
-  //       .snapshots()
-  //       .map((QuerySnapshot snapshot) {
-  //         return snapshot.docs
-  //             .where((doc) => doc.exists)
-  //             .map((doc) => PregnancyModel.fromFirestore(doc))
-  //             .toList();
-  //       });
-  // }
 
   Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {
     return _db
@@ -74,5 +62,9 @@ class PregnancyService {
           .map((doc) => PregnancyModel.fromFirestore(doc))
           .toList();
       });
+  }
+
+  Future<void> deactivatePregnancy(String pregnancyId) async {
+    await _db.collection('pregnancies').doc(pregnancyId).update({'isActive': false,});
   }
 }

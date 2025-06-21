@@ -359,6 +359,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
             telephoneNumber: _telephoneController.text.trim(),
             birthDate: _selectedBirthDate!,
             isPregnant: false,
+            notifications: [],
           );
           await UserService().createUserDocument(newUser);
           await user.updateDisplayName('${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}$firstName');
