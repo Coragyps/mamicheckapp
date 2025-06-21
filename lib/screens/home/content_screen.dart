@@ -485,7 +485,6 @@ Widget _buildGraphCarrousel (List<MeasurementModel> measurements) {
           width: 290,
           child: Card(
             margin: EdgeInsets.symmetric(horizontal: 8),
-            color: Theme.of(context).colorScheme.surfaceContainer,
             elevation: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -533,7 +532,7 @@ Widget _buildGraphCarrousel (List<MeasurementModel> measurements) {
           width: 320,
           child: Card(
             margin: EdgeInsets.symmetric(horizontal: 8),
-            color: Theme.of(context).colorScheme.surfaceContainer,
+            //color: Theme.of(context).colorScheme.surfaceContainerHigh,
             elevation: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,

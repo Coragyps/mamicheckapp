@@ -264,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBottomAppBar(String? uid, List<String>? pregnancyNames, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers) {
     return BottomAppBar(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      //olor: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Row(
         children: pregnancyNames!.isNotEmpty ? [
             MenuAnchor(

@@ -25,12 +25,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(212, 0, 255, 1)));
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));}
+        if (snapshot.connectionState == ConnectionState.waiting) {return MaterialApp(theme: theme,home: Scaffold(body: Center(child: CircularProgressIndicator())));}
         final user = snapshot.data;
-        if (user == null) {return const MaterialApp(home: LoginScreen());}
+        if (user == null) {return MaterialApp(theme: theme, home: LoginScreen());}
         return MultiProvider(
           providers: [
             Provider<User>.value(value: user),
@@ -58,11 +59,9 @@ class MyApp extends StatelessWidget {
             ),
           ],
           child: MaterialApp(
-            title: 'MamiCheck',
+            title: 'Mamicheck',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(212, 0, 255, 1))),
-            //theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(18, 169, 56, 1))),
-            //theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(60, 49, 27, 1))),
+            theme: theme,
             home: const HomeScreen(),
             onGenerateRoute: AppRouting.onGenerateRoute,
           ),
