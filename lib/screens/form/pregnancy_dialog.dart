@@ -79,180 +79,330 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fecha de última menstruación (calcular semanas)
-              TextFormField(
-                controller: _lastMenstrualPeriodController,
-                enabled: !_isSaving,
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Last Menstrual Period',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                    helpText: 'Select the Last Menstrual Period (LMP)',
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _selectedLastMenstrualPeriod = picked;
-                      _lastMenstrualPeriodController.text =
-                          '${picked.day.toString().padLeft(2, '0')}/'
-                          '${picked.month.toString().padLeft(2, '0')}/'
-                          '${picked.year}';
-                    });
-                  }
-                },
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Select the LMP date' : null,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.calendar_month_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _lastMenstrualPeriodController,
+                          enabled: !_isSaving,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Fecha de tu Última Regla',
+                            border: OutlineInputBorder(),
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                              helpText: 'Selecciona la fecha de tu última regla',
+                            );
+                            if (picked != null) {
+                              setState(() {
+                                _selectedLastMenstrualPeriod = picked;
+                                _lastMenstrualPeriodController.text =
+                                    '${picked.day.toString().padLeft(2, '0')}/'
+                                    '${picked.month.toString().padLeft(2, '0')}/'
+                                    '${picked.year}';
+                              });
+                            }
+                          },
+                          validator: (value) =>
+                              value == null || value.isEmpty ? 'Selecciona una fecha' : null,
+                        ),
+                        SizedBox(height: 8,),
+                        SwitchListTile(
+                          title: Text('¿Este es tu primer embarazo?'),
+                          value: _isFirstPregnancy,
+                          onChanged: _isSaving ? null : (value) {
+                            setState(() {
+                              _isFirstPregnancy = value;
+                              if (_isFirstPregnancy) {
+                                _gravidityController.text = '1';
+                                _parityController.text = '0';
+                                _selectedlastBirthDate = _selectedLastMenstrualPeriod;
+                                _intervalController.text = 'Sin Fecha';
+                              } else {
+                                _gravidityController.clear();
+                                _parityController.clear();
+                                _intervalController.clear();
+                                _selectedlastBirthDate = null;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Divider(),
+              const SizedBox(height: 36),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.medical_information_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _gravidityController,
+                          decoration: InputDecoration(
+                            labelText: 'Número de Embarazos',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) => value == null || value.isEmpty ? 'Ingrese la cantidad de embarazos' : null,
+                          //readOnly: _isFirstPregnancy,
+                          enabled: !_isSaving && !_isFirstPregnancy,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _parityController,
+                          decoration: InputDecoration(
+                            labelText: 'Número de Partos',
+                            border: OutlineInputBorder(),
+                          ),
+                          keyboardType: TextInputType.number,
+                          //readOnly: _isFirstPregnancy,
+                          enabled: !_isSaving && !_isFirstPregnancy,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-
-              // ¿Es su primer embarazo?
-              SwitchListTile(
-                title: Text('¿Este es tu primer embarazo?'),
-                value: _isFirstPregnancy,
-                onChanged: _isSaving ? null : (value) {
-                  setState(() {
-                    _isFirstPregnancy = value;
-                    if (_isFirstPregnancy) {
-                      _gravidityController.text = '1';
-                      _parityController.text = '0';
-                      _selectedlastBirthDate = _selectedLastMenstrualPeriod;
-                      _intervalController.text = 'Sin Fecha';
-                    } else {
-                      _gravidityController.clear();
-                      _parityController.clear();
-                      _intervalController.clear();
-                      _selectedlastBirthDate = null;
-                    }
-                  });
-                },
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.celebration_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _intervalController,
+                          //readOnly: true,
+                          enabled: !_isSaving && !_isFirstPregnancy, // Deshabilita totalmente el campo si es el primer embarazo
+                          decoration: const InputDecoration(
+                            labelText: 'Fecha del Último Parto',
+                            border: OutlineInputBorder(),
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                          onTap: _isFirstPregnancy
+                              ? null
+                              : () async {
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1950),
+                                    lastDate: DateTime.now(),
+                                    helpText: 'Selecciona el año y mes del último parto',
+                                    initialDatePickerMode: DatePickerMode.year,
+                                  );
+                                  if (picked != null) {
+                                    setState(() {
+                                      _selectedlastBirthDate = picked;
+                                      _intervalController.text =
+                                          '${picked.day.toString().padLeft(2, '0')}/'
+                                          '${picked.month.toString().padLeft(2, '0')}/'
+                                          '${picked.year}';
+                                    });
+                                  }
+                                },
+                          validator: (value) => !_isFirstPregnancy && (value == null || value.isEmpty)
+                              ? 'Seleccione la fecha del último parto'
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-
-              TextFormField(
-                controller: _gravidityController,
-                decoration: InputDecoration(
-                  labelText: 'Número de embarazos (gravidez)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? 'Ingrese la cantidad de embarazos' : null,
-                //readOnly: _isFirstPregnancy,
-                enabled: !_isSaving && !_isFirstPregnancy,
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.monitor_heart_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        CheckboxListTile(
+                          title: Text('Tuve complicación hipertensiva o preeclampsia antes'),
+                          value: _previousHypertensiveDisorder,
+                          onChanged: _isFirstPregnancy || _isSaving ? null : (val) => setState(() => _previousHypertensiveDisorder = val ?? false),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
+              Divider(),
+              const SizedBox(height: 36),
 
-              TextFormField(
-                controller: _parityController,
-                decoration: InputDecoration(
-                  labelText: 'Número de partos (paridad)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                //readOnly: _isFirstPregnancy,
-                enabled: !_isSaving && !_isFirstPregnancy,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.child_care_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        DropdownButtonFormField<int>(
+                          decoration: InputDecoration(
+                            labelText: 'Tipo de embarazo',
+                            border: OutlineInputBorder(),
+                          ),
+                          value: _fetalCount,
+                          onChanged: _isSaving ? null : (val) => setState(() => _fetalCount = val!),
+                          items: [
+                            {'label': 'Aún no sé', 'value': 0},
+                            {'label': 'Embarazo Único', 'value': 1},
+                            {'label': 'Mellizos', 'value': 2},
+                            {'label': 'Trillizos o más', 'value': 3},
+                          ].map((e) {
+                            return DropdownMenuItem<int>(
+                              value: e['value'] as int,
+                              child: Text(e['label'] as String),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-
-              TextFormField(
-                controller: _intervalController,
-                //readOnly: true,
-                enabled: !_isSaving && !_isFirstPregnancy, // Deshabilita totalmente el campo si es el primer embarazo
-                decoration: const InputDecoration(
-                  labelText: 'Fecha del último parto (Intervalo intergenesico)',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                onTap: _isFirstPregnancy
-                    ? null
-                    : () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1950),
-                          lastDate: DateTime.now(),
-                          helpText: 'Selecciona el año y mes del último parto',
-                          initialDatePickerMode: DatePickerMode.year,
-                        );
-                        if (picked != null) {
-                          setState(() {
-                            _selectedlastBirthDate = picked;
-                            _intervalController.text =
-                                '${picked.day.toString().padLeft(2, '0')}/'
-                                '${picked.month.toString().padLeft(2, '0')}/'
-                                '${picked.year}';
-                          });
-                        }
-                      },
-                validator: (value) => !_isFirstPregnancy && (value == null || value.isEmpty)
-                    ? 'Seleccione la fecha del último parto'
-                    : null,
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.biotech_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        CheckboxListTile(
+                          title: Text('Se usó técnicas de reproducción asistida'),
+                          value: _assistedReproduction,
+                          onChanged: _isSaving ? null : (val) => setState(() => _assistedReproduction = val ?? false),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 8),
 
-              const SizedBox(height: 16),
-
-              CheckboxListTile(
-                title: Text('¿Tuviste complicación hipertensiva o preeclampsia antes?'),
-                value: _previousHypertensiveDisorder,
-                onChanged: _isFirstPregnancy || _isSaving ? null : (val) => setState(() => _previousHypertensiveDisorder = val ?? false),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.balance_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          enabled: !_isSaving,
+                          controller: _weightController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Peso pregestacional',
+                            suffixText: 'kg.',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          enabled: !_isSaving,
+                          controller: _heightController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Talla pregestacional',
+                            suffixText: 'cm.',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-
-              DropdownButtonFormField<int>(
-                decoration: InputDecoration(
-                  labelText: 'Tipo de embarazo',
-                  border: OutlineInputBorder(),
-                ),
-                value: _fetalCount,
-                onChanged: _isSaving ? null : (val) => setState(() => _fetalCount = val!),
-                items: [
-                  {'label': 'Aún no sé', 'value': 0},
-                  {'label': 'Embarazo Único', 'value': 1},
-                  {'label': 'Mellizos', 'value': 2},
-                  {'label': 'Trillizos o más', 'value': 3},
-                ].map((e) {
-                  return DropdownMenuItem<int>(
-                    value: e['value'] as int,
-                    child: Text(e['label'] as String),
-                  );
-                }).toList(),
+              const SizedBox(height: 36),
+              Divider(),
+              const SizedBox(height: 36),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.bloodtype_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Historial de diabetes',
+                            border: OutlineInputBorder(),
+                          ),
+                          value: _diabetesHistory,
+                          onChanged: _isSaving ? null : (val) => setState(() => _diabetesHistory = val!),
+                          items: ['Ninguno', 'Diabetes Tipo 1', 'Diabetes Tipo 2']
+                              .map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 16),
-
-              CheckboxListTile(
-                title: Text('¿Usó técnicas de reproducción asistida?'),
-                value: _assistedReproduction,
-                onChanged: _isSaving ? null : (val) => setState(() => _assistedReproduction = val ?? false),
-              ),
-
-              const SizedBox(height: 16),
-              TextFormField(
-                enabled: !_isSaving,
-                controller: _weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Peso pregestacional (kg)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                enabled: !_isSaving,
-                controller: _heightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Talla pregestacional (cm)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.sick_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
               CheckboxListTile(
                 title: Text('¿Lupus Eritematoso Sistémico?'),
                 value: _lupus,
@@ -263,18 +413,6 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                 value: _antiphospholipidSyndrome,
                 onChanged: _isSaving ? null : (val) => setState(() => _antiphospholipidSyndrome = val ?? false),
               ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Historial de diabetes',
-                  border: OutlineInputBorder(),
-                ),
-                value: _diabetesHistory,
-                onChanged: _isSaving ? null : (val) => setState(() => _diabetesHistory = val!),
-                items: ['Ninguno', 'Diabetes Tipo 1', 'Diabetes Tipo 2']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-              ),
-              const SizedBox(height: 16),
               CheckboxListTile(
                 title: Text('¿Antecedente familiar de preeclampsia?'),
                 value: _familyHistoryPreeclampsia,
@@ -289,6 +427,12 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                 title: Text('¿Enfermedad Renal crónica?'),
                 value: _chronicKidneyDisease,
                 onChanged: _isSaving ? null : (val) => setState(() => _chronicKidneyDisease = val ?? false),
+              ),
+
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

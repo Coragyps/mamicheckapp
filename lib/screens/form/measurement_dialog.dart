@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mamicheckapp/main.dart';
 import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/services/measurement_service.dart';
 import 'package:http/http.dart' as http;
@@ -77,101 +79,181 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
           key: _formKey,
           child: Column(
             children: [
-              // Fecha picker simplificado
-              ListTile(
-                title: Text('Embarazo: ${widget.pregnancyId}'),
-              ),
-              ListTile(
-                title: Text('Fecha: ${_measurementDate.toLocal().toString().split(' ')[0]}'),
-                trailing: const Icon(Icons.calendar_today),
-              ),
+              // // Fecha picker simplificado
               // ListTile(
-              //   title: Text('Fecha: ${widget.birthDate.toLocal().toString().split(' ')[0]}'),
+              //   title: Text('Embarazo: ${widget.pregnancyId}'),
+              // ),
+              // ListTile(
+              //   title: Text('Fecha: ${_measurementDate.toLocal().toString().split(' ')[0]}'),
               //   trailing: const Icon(Icons.calendar_today),
               // ),
-              TextFormField(
-                controller: _systolicController,
-                enabled: !_isSaving,
-                decoration: const InputDecoration(labelText: 'Presión Sistólica (opcional)', border: OutlineInputBorder(),suffixText: 'mmHg'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.trim().isEmpty) return 'Este campo es obligatorio';
-                  final parsed = int.tryParse(value.trim());
-                  if (parsed == null) return 'Debe ser un número entero';
-                  if (parsed < 80 || parsed > 200) return 'Debe estar entre 80 y 200';
-                  return null;
-                },
+              // // ListTile(
+              // //   title: Text('Fecha: ${widget.birthDate.toLocal().toString().split(' ')[0]}'),
+              // //   trailing: const Icon(Icons.calendar_today),
+              // // ),
+              Image(image: AssetImage('assets/img/bloodpressure.png'), fit: BoxFit.contain),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.monitor_heart_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _systolicController,
+                          enabled: !_isSaving,
+                          decoration: const InputDecoration(labelText: 'Presión Sistólica', border: OutlineInputBorder(),suffixText: 'mmHg'),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.trim().isEmpty) return 'Este campo es obligatorio';
+                            final parsed = int.tryParse(value.trim());
+                            if (parsed == null) return 'Debe ser un número entero';
+                            if (parsed < 80 || parsed > 200) return 'Debe estar entre 80 y 200';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _diastolicController,
+                          enabled: !_isSaving,
+                          decoration: const InputDecoration(labelText: 'Presión Diastólica', border: OutlineInputBorder(), suffixText: 'mmHg'),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.trim().isEmpty) return 'Este campo es obligatorio';
+                            final parsed = int.tryParse(value.trim());
+                            if (parsed == null) return 'Debe ser un número entero';
+                            if (parsed < 50 || parsed > 130) return 'Debe estar entre 50 y 130';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _heartRateController,
+                          enabled: !_isSaving,
+                          decoration: const InputDecoration(labelText: 'Frecuencia Cardíaca', border: OutlineInputBorder(), suffixText: 'bpm'),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.trim().isEmpty) return 'Este campo es obligatorio';
+                            final parsed = int.tryParse(value.trim());
+                            if (parsed == null) return 'Debe ser un número entero';
+                            if (parsed < 40 || parsed > 200) return 'Debe estar entre 40 y 200';
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 36),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.thermostat_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _temperatureController,
+                          enabled: !_isSaving,
+                          decoration: const InputDecoration(labelText: 'Temperatura', border: OutlineInputBorder(), suffixText: '°C'),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.trim().isEmpty) return null;
+                            final parsed = double.tryParse(value.trim());
+                            if (parsed == null) return 'Debe ser un número válido';
+                            if (parsed < 34 || parsed > 42) return 'Debe estar entre 34.0 y 42.0 °C';
+                            return null;
+                          },
+                        ),                          
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton.filledTonal(
+                    onPressed: () {
+                      _temperatureController.text = '37';
+                    },
+                    icon: Icon(Icons.info_outline),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _diastolicController,
-                enabled: !_isSaving,
-                decoration: const InputDecoration(labelText: 'Presión Diastólica (opcional)', border: OutlineInputBorder(), suffixText: 'mmHg'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.trim().isEmpty) return 'Este campo es obligatorio';
-                  final parsed = int.tryParse(value.trim());
-                  if (parsed == null) return 'Debe ser un número entero';
-                  if (parsed < 50 || parsed > 130) return 'Debe estar entre 50 y 130';
-                  return null;
-                },
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.bloodtype_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _bloodSugarController,
+                          enabled: !_isSaving,
+                          decoration: const InputDecoration(labelText: 'Glucosa en sangre', border: OutlineInputBorder(), suffixText: 'mmol/L'),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.trim().isEmpty) return null;
+                            final parsed = double.tryParse(value.trim());
+                            if (parsed == null) return 'Debe ser un número válido';
+                            if (parsed < 2.0 || parsed > 22.0) return 'Debe estar entre 2.0 y 22.0 mmol/L';
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton.filledTonal(
+                    onPressed: () {
+                      _bloodSugarController.text = '4';
+                    },
+                    icon: Icon(Icons.info_outline),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _heartRateController,
-                enabled: !_isSaving,
-                decoration: const InputDecoration(labelText: 'Frecuencia Cardíaca (opcional)', border: OutlineInputBorder(), suffixText: 'bpm'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.trim().isEmpty) return 'Este campo es obligatorio';
-                  final parsed = int.tryParse(value.trim());
-                  if (parsed == null) return 'Debe ser un número entero';
-                  if (parsed < 40 || parsed > 200) return 'Debe estar entre 40 y 200';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _bloodSugarController,
-                enabled: !_isSaving,
-                decoration: const InputDecoration(labelText: 'Glucosa en sangre (mmol/L) (opcional)', border: OutlineInputBorder(), suffixText: 'mmol/L'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.trim().isEmpty) return null;
-                  final parsed = double.tryParse(value.trim());
-                  if (parsed == null) return 'Debe ser un número válido';
-                  if (parsed < 2.0 || parsed > 22.0) return 'Debe estar entre 2.0 y 22.0 mmol/L';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _temperatureController,
-                enabled: !_isSaving,
-                decoration: const InputDecoration(labelText: 'Temperatura (opcional)', border: OutlineInputBorder(), suffixText: '°C'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value!.trim().isEmpty) return null;
-                  final parsed = double.tryParse(value.trim());
-                  if (parsed == null) return 'Debe ser un número válido';
-                  if (parsed < 34 || parsed > 42) return 'Debe estar entre 34.0 y 42.0 °C';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _notesController,
-                enabled: !_isSaving,
-                decoration: const InputDecoration(labelText: 'Notas (opcional)', border: OutlineInputBorder(),),
-                keyboardType: TextInputType.text,
-                maxLines: 3,
-                validator: (value) {
-                  // Opcionalmente puedes validar longitud si es necesario
-                  if (value != null && value.length > 500) {
-                    return 'Máximo 500 caracteres';
-                  }
-                  return null;
-                },
+              const SizedBox(height: 36),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Icon(Icons.announcement_outlined),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _notesController,
+                          enabled: !_isSaving,
+                          decoration: const InputDecoration(labelText: 'Comentarios', border: OutlineInputBorder(),),
+                          keyboardType: TextInputType.text,
+                          maxLines: 3,
+                          validator: (value) {
+                            // Opcionalmente puedes validar longitud si es necesario
+                            if (value != null && value.length > 500) {
+                              return 'Máximo 500 caracteres';
+                            }
+                            return null;
+                          },
+                        ),                         
+                      ],
+                    ),
+                  )
+                ],
               ),
             ],
           ),
@@ -189,28 +271,6 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context, rootNavigator: true);
     int? riskLevel;
-
-    // try {
-    //   final measurement = MeasurementModel(
-    //     date: _measurementDate,
-    //     age: _calculateAge(widget.birthDate),
-    //     systolicBP: int.parse(_systolicController.text.trim()),
-    //     diastolicBP: int.parse(_diastolicController.text.trim()),
-    //     heartRate: int.parse(_heartRateController.text.trim()),
-    //     bloodSugar: _bloodSugarController.text.trim().isEmpty ? null : double.parse(_bloodSugarController.text.trim()),
-    //     temperature: _temperatureController.text.trim().isEmpty ? null : double.parse(_temperatureController.text.trim()),
-    //     riskLevel: 0,
-    //     notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
-    //   );
-
-    //   await MeasurementService().createMeasurement(widget.pregnancy, measurement);
-
-    //   navigator.pop();
-    // } catch (e) {
-    //   messenger.showSnackBar(
-    //     SnackBar(content: Text('Error al guardar la medición: $e')),
-    //   );
-    // }
 
     try {
       if (_camposCompletos()) {
@@ -268,6 +328,32 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
       );
 
       await MeasurementService().createMeasurement(widget.pregnancyId, widget.currentMeasurements, measurement);
+      final allMeasurements = [...widget.currentMeasurements, measurement];
+      final last3 = allMeasurements.reversed.take(3).toList();
+      final allHighRisk = last3.length == 3 && last3.every((m) => m.riskLevel == 2);
+      if (allHighRisk) {
+      // Mostrar notificación push
+      await showTestNotification();
+
+      // Mostrar diálogo dentro de la app
+      if (context.mounted) {
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('¡Atención!'),
+            content: const Text(
+              'Tus ultimas mediciones consecutivas han tenido riesgo alto.\n\nTe recomendamos que contactes a tu médico lo antes posible.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Entendido'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
       navigator.pop();
 
     } catch (e) {
@@ -283,5 +369,22 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
     int age = today.year - birthDate.year;
     if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {age--;}
     return age;
+  }
+
+    Future<void> showTestNotification() async {
+    const androidDetails = AndroidNotificationDetails(
+      'mamicheck_channel',
+      'Mamicheck Notificaciones',
+      channelDescription: 'Notificaciones de ejemplo',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+
+    const notificationDetails = NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      0, 'Mamicheck', '¡Hola! Tus ultimos riesgos han sido altos. Consulta con tu Medico.', notificationDetails,
+    );
   }
 }

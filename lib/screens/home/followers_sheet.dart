@@ -47,10 +47,10 @@ class FollowersSheet extends StatelessWidget {
                   child: Text(uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? 'MR' : uid[0]+uid[1],style: TextStyle(color: baseColor.shade100))
                   //child: Text(uid[0]+uid[1],style: TextStyle(color: baseColor.shade100)),
                 ),                
-                title: Text(uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? 'Mamicheck (Admin)' : role, style: Theme.of(context).textTheme.bodyMedium),
+                title: Text(uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? 'Mamicheck (Admin)' : '($role)', style: Theme.of(context).textTheme.labelLarge),
                 subtitle: Text(uid, style: Theme.of(context).textTheme.bodySmall),
-                trailing: role == 'owner' || uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? null : IconButton(
-                  icon: const Icon(Icons.remove_circle, color: Colors.redAccent),
+                trailing: role == 'owner' || uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? null : IconButton.filled(
+                  icon: Icon(Icons.delete_forever, color: Theme.of(context).colorScheme.onPrimary),
                   onPressed: () async {
                     await pregnancyService.removeFollower(pregnancyId, uid);
                     messenger.showSnackBar(SnackBar(content: Text('Seguidor eliminado correctamente.')));

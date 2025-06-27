@@ -25,7 +25,32 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      // appBar: AppBar(
+      //   toolbarHeight: 75,
+      //   centerTitle: true,
+      //   title: ListTile(
+      //     leading: Image(image: AssetImage('assets/img/logo.png'), fit: BoxFit.contain),
+      //     title: Text('Mamicheck'),
+      //     titleTextStyle: Theme.of(context).textTheme.displayMedium?.copyWith(fontFamily: 'caveat', color: Color(0xffCA3E7F), height: 0.9),
+      //     subtitle: Text('Tu Aliado en el Embarazo'),
+      //     subtitleTextStyle: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.onPrimaryFixed),
+      //   ),
+      // ),
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image(image: AssetImage('assets/img/logo.png'), fit: BoxFit.contain, height: 54),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Mamicheck', style: Theme.of(context).textTheme.displayMedium?.copyWith(fontFamily: 'caveat', color: Color(0xffCA3E7F), height: 0.8)),
+                Text('Tu Aliado en el Embarazo', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimaryFixed)),
+              ],
+            ),
+          ],
+        ),
+      ),
       body: _body(context),
       bottomNavigationBar: _navbar(context),
     );
@@ -40,65 +65,60 @@ class _LoginScreenState extends State<LoginScreen> {
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Mi Historial:', style: TextStyle(
-                  fontFamily: 'Caveat',
-                  fontSize: 42,
-                )),
-                //const SizedBox(height: 16),
-                Text('Quisit odio, at nobis minima, ullam. Minimaquos, cumque aut velit sunt, animi! Nihiliure, hic tempora amet dolores libero. Hicneque tempora sit, quam eos odit! Laborumanimi, quo, tempora ad tempora animi! Nesciuntsed unde alias unde sit, ad. Aliasdolores rem, in rem, ipsum sed. Temporasunt eveniet nobis amet ullam in. Modiad ullam, vero et amet ut? Sintvitae in, nesciunt, quis nihil eos! '),
-                const SizedBox(height: 46),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Correo Electronico",
-                  ),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'El correo no puede estar en blanco' : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Contraseña",
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setState(() {_obscurePassword = !_obscurePassword;});
-                      },
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Icon(Icons.mail_outline),
                     ),
-                  ),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'La contraseña no puede estar en blanco' : null,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Correo Electronico',
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) =>  value == null || value.isEmpty ? 'El correo no puede estar en blanco' : null,
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Contraseña',
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () {
+                                  setState(() {_obscurePassword = !_obscurePassword;});
+                                },
+                              ),
+                            ),
+                            validator: (value) => value == null || value.isEmpty ? 'La contraseña no puede estar en blanco' : null,
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
-                const SizedBox(height: 32),
-                FilledButton(
-                  onPressed: () => _handleSignin(context),
-                  child: const Text("Ingresar"),
-                ),
-
-                const SizedBox(height: 12),
-
-                TextButton(
-                  onPressed: () {
-                    _emailController.text = 'mamicheckroot@gmail.com';
-                    _passwordController.text = '123456';
-                    _handleSignin(context);
-                  },
-                  child: const Text(
-                    "mamicheckroot (debug)",
-                    style: TextStyle(color: Colors.redAccent),
-                  ),
-                )
+                // FilledButton(
+                //   onPressed: () {
+                //     _emailController.text = 'mamicheckroot@gmail.com';
+                //     _passwordController.text = '123456';
+                //     _handleSignin(context);
+                //   }, child: const Text("mamicheckroot (debug)"),
+                // )
               ],
             ),
           ),
@@ -110,10 +130,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _navbar(BuildContext context) {
     return BottomAppBar(
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('¿Aun no tienes una cuenta?',),
-            ElevatedButton.icon(
+            FilledButton.icon(
+              icon: const Icon(Icons.login),
+              onPressed: () => _handleSignin(context),
+              label: const Text('Ingresar'),
+            ),
+            OutlinedButton.icon(
               icon: const Icon(Icons.account_circle),
               onPressed: () {
                 _formKey.currentState?.reset();

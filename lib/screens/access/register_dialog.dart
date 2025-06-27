@@ -83,7 +83,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
                             border: OutlineInputBorder(),
                             labelText: 'Nombres',
                           ),
-                          validator: (value) => value == null || value.isEmpty ? 'Enter your First Name' : null,
+                          validator: (value) => value == null || value.isEmpty ? 'Ingresa tu Nombre' : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -92,14 +92,14 @@ class _RegisterDialogState extends State<RegisterDialog> {
                             border: OutlineInputBorder(),
                             labelText: 'Apellidos',
                           ),
-                          validator: (value) => value == null || value.isEmpty ? 'Enter your Last Name' : null,
+                          validator: (value) => value == null || value.isEmpty ? 'Ingresa tus Apellidos' : null,
                         ),
                       ],
                     ),
                   )
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 36),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -138,14 +138,14 @@ class _RegisterDialogState extends State<RegisterDialog> {
                               });
                             }
                           },
-                          validator: (value) => value == null || value.isEmpty ? 'Select Birth Date' : null,
+                          validator: (value) => value == null || value.isEmpty ? 'Selecciona tu fecha de Nacimiento' : null,
                         ),
                       ],
                     ),
                   )
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 36),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,7 +164,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
                             labelText: 'Correo Electronico',
                           ),
                           keyboardType: TextInputType.emailAddress,
-                          validator: (value) => value == null || value.isEmpty ? 'Enter an email' : null,
+                          validator: (value) => value == null || value.isEmpty ? 'Ingresa un Correo Electronico' : null,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -184,16 +184,14 @@ class _RegisterDialogState extends State<RegisterDialog> {
                               },
                             ),
                           ),
-                          validator: (value) => value != null && value.length < 6
-                              ? 'Password must be at least 6 characters'
-                              : null,
+                          validator: (value) => value != null && value.length < 6 ? 'Minimo 6 Caracteres' : null,
                         ),
                       ],
                     ),
                   )
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 36),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

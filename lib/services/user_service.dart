@@ -19,16 +19,46 @@ class UserService {
     return UserModel.fromFirestore(doc);
   }
 
-  // Future<UserModel?> getUser(String uid) async {
-  //   final doc = await _db.collection('users').doc(uid).get();
+  Stream<UserModel?> watchUser(String? uid) {
+    if (uid == null || uid.isEmpty) {return const Stream.empty();}
 
-  //   if (!doc.exists) {
-  //     debugPrint('⚠️ Usuario con UID $uid no encontrado en Firestore.');
-  //     return null;
-  //   }
+    return _db.collection('users').doc(uid).snapshots().map((doc) {
+      if (!doc.exists) return null;
+      return UserModel.fromFirestore(doc);
+    });
+  }
 
-  //   final userModel = UserModel.fromFirestore(doc);
-  //   debugPrint('✅ Usuario cargado desde Firestore: ${userModel.toMap()}');
-  //   return userModel;
-  // }
+  Future<String?> getUidByEmail(String email) async {
+    final query = await _db.collection('users').where('email', isEqualTo: email).limit(1).get();
+    if (query.docs.isEmpty) return null;
+    return query.docs.first.id; // el UID es el ID del documento
+  }
+
+  Future<void> sendPregnancyInviteNotification({required String uid, required String pregnancyId, required String pregnancyName}) async {
+    final docRef = _db.collection('users').doc(uid);
+
+    final newNotification = {
+      'pregnancyId': pregnancyId,
+      'pregnancyName': pregnancyName,
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+
+    await docRef.update({
+      'notifications': FieldValue.arrayUnion([newNotification])
+    });
+  }
+
+  Future<void> deleteNotification({required String uid, required String pregnancyId, required String pregnancyName, required String timestamp }) async {
+    final docRef = _db.collection('users').doc(uid);
+
+    final notificationToRemove = {
+      'pregnancyId': pregnancyId,
+      'pregnancyName': pregnancyName,
+      'timestamp': timestamp,
+    };
+
+    await docRef.update({
+      'notifications': FieldValue.arrayRemove([notificationToRemove])
+    });
+  }
 }

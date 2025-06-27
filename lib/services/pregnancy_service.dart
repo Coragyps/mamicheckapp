@@ -51,7 +51,8 @@ class PregnancyService {
     await docRef.update({'followers.$uid': FieldValue.delete()});
   }
 
-  Stream<List<PregnancyModel>> watchFollowedPregnancies(String uid) {
+  Stream<List<PregnancyModel>> watchFollowedPregnancies(String? uid) {
+    if (uid == null || uid.isEmpty) {return const Stream.empty();}
     return _db
       .collection('pregnancies')
       .where('followers.$uid', whereIn: ["owner", "companion"])

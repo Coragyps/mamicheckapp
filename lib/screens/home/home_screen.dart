@@ -4,6 +4,7 @@ import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
 import 'package:mamicheckapp/models/user_model.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
+import 'package:mamicheckapp/screens/form/invite_sheet.dart';
 import 'package:mamicheckapp/screens/home/content_screen.dart';
 import 'package:mamicheckapp/screens/home/followers_sheet.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
@@ -24,155 +25,90 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-  // final pregnancies = context.watch<List<PregnancyModel>>();
-  // final userModel = context.watch<UserModel?>();
+    final List<PregnancyModel> pregnancies = context.watch<List<PregnancyModel>>();
+    final UserModel? userModel = context.watch<UserModel?>();
+    final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
+    final now = DateTime.now();
+    final bool isLoading = pregnancies.length == 1 && pregnancies.first.id == 'dummy';
+    final bool hasActiveOwnedPregnancy = userModel != null && pregnancies.isNotEmpty && pregnancies.first.isActive && pregnancies.first.followers[userModel.uid] == 'owner';
 
-  // if (userModel == null) {
-  //   return Scaffold(
-  //     body: Center(
-  //       child: CircularProgressIndicator(),
-  //     ),
-  //   );
-  // }
-
-  // if (pregnancies.isEmpty) {
-  //   return Scaffold(
-  //     body: Center(
-  //       child: Text('No hay embarazos disponibles'),
-  //     ),
-  //   );
-  // }
-
-  // if (pregnancies.isNotEmpty) {
-  //   final rawMeasurements = pregnancies[selectedPregnancyIndex].measurements..sort((a, b) => a.date.compareTo(b.date));
-  //   final lastPeriodDate = pregnancies[selectedPregnancyIndex].lastMenstrualPeriod;
-
-  //   final filteredMeasurements = switch (selectedPeriod) {
-  //     'Últimos 7 Días' => rawMeasurements.where((m) => DateTime.now().difference(m.date).inDays <= 7).toList(),
-  //     'Últimos 30 Días' => rawMeasurements.where((m) => DateTime.now().difference(m.date).inDays <= 30).toList(),
-  //     '1er Trimestre' => rawMeasurements.where((m) {
-  //         final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
-  //         return week >= 0 && week <= 13;
-  //       }).toList(),
-  //     '2do Trimestre' => rawMeasurements.where((m) {
-  //         final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
-  //         return week >= 14 && week <= 27;
-  //       }).toList(),
-  //     '3er Trimestre' => rawMeasurements.where((m) {
-  //         final week = m.date.difference(lastPeriodDate).inDays ~/ 7;
-  //         return week >= 28;
-  //       }).toList(),
-  //     _ => rawMeasurements, // 'Ver Todo' o cualquier otro
-  //   };
-  // }
-
-  // return Scaffold(
-  //   appBar: _buildAppBar(context),
-  //   body: ContentScreen(
-  //     pregnancy: pregnancies[selectedPregnancyIndex],
-  //     uid: userModel.uid,
-  //     firstName: userModel.firstName,
-  //     birthDate: userModel.birthDate,
-  //     selectedPeriod: selectedPeriod,
-  //     filteredMeasurements: filteredMeasurements,
-  //   ),
-  //   bottomNavigationBar: _buildBottomAppBar(context, pregnancies, userModel.uid),
-  //   floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-  //   floatingActionButton: _buildFloatingActionButton(context, pregnancies, userModel),
-  // );
-
-  //final pregnancies = context.watch<List<PregnancyModel>>();
-
-  // final List<PregnancyModel> pregnancies = context.watch<List<PregnancyModel>>();
-  // final UserModel? userModel = context.watch<UserModel?>();
-  // final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
-////////
-
-  final List<PregnancyModel> pregnancies = context.watch<List<PregnancyModel>>();
-  final UserModel? userModel = context.watch<UserModel?>();
-  final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
-  final now = DateTime.now();
-
-  final filteredMeasurements = switch (selectedPeriod) {
-    'Últimos 7 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 7).toList(),
-    'Últimos 30 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 30).toList(),
-    '1er Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 0 && week <= 13;}).toList(),
-    '2do Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 14 && week <= 27;}).toList(),
-    '3er Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 28;}).toList(),
-    _ => selectedPregnancy?.measurements,
-  };
-
-//////////////
-
-  // final bool isLoading = userModel == null;
-  // final bool hasPregnancies = pregnancies.isNotEmpty;
-
-  // List<MeasurementModel> filteredMeasurements = [];
-  // //DateTime? lastPeriodDate;
-
-  // if (!isLoading && hasPregnancies) {
-  //   final validIndex = selectedPregnancyIndex.clamp(0, pregnancies.length - 1);
-  //   selectedPregnancy = pregnancies[validIndex];
-  //   lastPeriodDate = selectedPregnancy.lastMenstrualPeriod;
-
-  //   final rawMeasurements = [...selectedPregnancy.measurements]..sort((a, b) => a.date.compareTo(b.date));
-  //   filteredMeasurements = _filterMeasurements(rawMeasurements, lastPeriodDate, selectedPeriod);
-  // }
+    final filteredMeasurements = switch (selectedPeriod) {
+      'Últimos 7 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 7).toList(),
+      'Últimos 30 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 30).toList(),
+      '1er Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 0 && week <= 13;}).toList(),
+      '2do Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 14 && week <= 27;}).toList(),
+      '3er Trimestre' => selectedPregnancy?.measurements.where((m) {final week = m.date.difference(selectedPregnancy.lastMenstrualPeriod).inDays ~/ 7; return week >= 28;}).toList(),
+      _ => selectedPregnancy?.measurements,
+    };
 
     return Scaffold(
-      appBar: _buildAppBar(userModel?.firstName, userModel?.lastName, userModel?.uid, userModel?.notifications),
-      bottomNavigationBar: _buildBottomAppBar(userModel?.uid, pregnancies.map((p) => p.name).toList(), selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers),
-      body: _body(selectedPregnancy, userModel?.uid, userModel?.firstName, userModel?.birthDate, selectedPregnancy?.measurements),
+      appBar: _buildAppBar(userModel?.firstName, userModel?.lastName, userModel?.uid, userModel?.notifications),  
+      bottomNavigationBar: _buildBottomAppBar(userModel?.uid, pregnancies.map((p) => p.name).toList(), selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers, hasActiveOwnedPregnancy, userModel?.firstName, userModel?.birthDate),
+      body: isLoading ? Center(child: CircularProgressIndicator()) : pregnancies.isEmpty && userModel != null ?
+      Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _suggestionCard(
+              title: '¿Tienes un embarazo activo?',
+              description: 'Has seguimiento continuo a tu salud registrando tus datos.',
+              button: ElevatedButton.icon(
+                icon: const Icon(Icons.playlist_add),
+                label: const Text('Registrar mi Embarazo'),
+                onPressed: () {
+                  Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: userModel.uid, firstName: userModel.firstName, birthDate: userModel.birthDate));
+                },
+              )
+            ),
+            _suggestionCard(
+              title: '¿Buscas monitorear un embarazo?',
+              description: 'La gestante te puede enviar una solicitud para que aceptes unirte al monitoreo',
+              button: ElevatedButton.icon(
+                icon: const Icon(Icons.open_in_new),
+                label: const Text('Ir a Notificaciones'),
+                onPressed: () {Navigator.pushNamed(context, 'NotificationScreen');},
+              )
+            ),
+          ],
+        )
+      ) : ContentScreen(pregnancy: selectedPregnancy, uid: userModel?.uid, selectedPeriod: selectedPeriod, filteredMeasurements: filteredMeasurements ?? [], firstName: userModel?.firstName, birthDate: userModel?.birthDate),
       floatingActionButton: _buildFloatingActionButton(userModel?.uid, userModel?.birthDate, selectedPregnancy?.measurements, selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 
-  _body(PregnancyModel? selectedPregnancy, String? uid, String? firstName, DateTime? birthDate, List<MeasurementModel>? currentMeasurements) {
-    return selectedPregnancy != null && uid != null && firstName != null && birthDate != null && currentMeasurements != null ? ContentScreen(
-      pregnancy: selectedPregnancy,
-      uid: uid,
-      firstName: firstName,
-      birthDate: birthDate,
-      selectedPeriod: selectedPeriod,
-      filteredMeasurements: currentMeasurements,
-    ) : Center(child: CircularProgressIndicator());
-    
-    // Padding(
-    //   padding: const EdgeInsets.all(16),
-    //   child: Column(
-    //     spacing: 15,
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     children: [
-    //       _suggestionCard(
-    //         title: '¿Tienes un embarazo activo?',
-    //         description: 'Has seguimiento continuo a tu salud registrando tus datos.',
-    //         button: FilledButton.icon(
-    //           icon: const Icon(Icons.playlist_add),
-    //           label: const Text('Registrar mi Embarazo'),
-    //           onPressed: () {
-    //             Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: uid!, firstName: firstName!, birthDate: birthDate!));
-    //           },
-    //         )
-    //       ),
-    //       _suggestionCard(
-    //         title: '¿Buscas monitorear un embarazo?',
-    //         description: 'Utiliza el código que te compartió la gestante.',
-    //         button: FilledButton.icon(
-    //           icon: const Icon(Icons.open_in_new),
-    //           label: const Text('Ir a Notificaciones'),
-    //           onPressed: () {Navigator.pushNamed(context, 'NotificationScreen');},
-    //         )
-    //       ),
-    //     ],
-    //   ),
-    // );
-    
+  Widget _suggestionCard({required String title, required String description, required ElevatedButton button}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Card(
+        elevation: 0,
+        color: Theme.of(context).colorScheme.secondaryFixed,
+        //margin: const EdgeInsets.only(bottom: 48),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 32, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                    Text(description),
+                    button
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   PreferredSizeWidget _buildAppBar(String? firstName, String? lastName, String? uid, List<Map<String, dynamic>>? notifications) {
     return AppBar(
-      forceMaterialTransparency: true,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Image(image: AssetImage('assets/img/logo.png'), fit: BoxFit.contain)
@@ -262,34 +198,49 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomAppBar(String? uid, List<String>? pregnancyNames, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers) {
+  Widget _buildBottomAppBar(String? uid, List<String>? pregnancyNames, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers, bool hasActiveOwnedPregnancy, String? firstName, DateTime? birthDate) {
     return BottomAppBar(
       //olor: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Row(
-        children: pregnancyNames!.isNotEmpty ? [
+        children: [
             MenuAnchor(
               builder: (context, controller, _) {
-                return ElevatedButton.icon(
+                return FilledButton.icon(
                   icon: controller.isOpen ? Icon(Icons.expand_more) : Icon(Icons.expand_less),
                   label: Text('Monitorear'),
                   onPressed: controller.isOpen ? controller.close : controller.open,
                 );
               },
               menuChildren: [
-                for (int i = 0; i < pregnancyNames!.length; i++) 
-                MenuItemButton(
-                  leadingIcon: selectedPregnancyIndex == i ? Icon(Icons.remove_red_eye) : null,
-                  onPressed: () {
-                    final messenger = ScaffoldMessenger.of(context);
-                    setState(() {
-                      selectedPregnancyIndex = i;
-                    });
-                    messenger.showSnackBar(SnackBar(content: Text('Mostrando ${pregnancyNames[i]}')));
-                  },
-                  child: Text(pregnancyNames[i]),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+                  child: Text('Selecciona el\nEmbarazo:'),
                 ),
+                if (pregnancyNames!.isNotEmpty) ...[
+                  for (int i = 0; i < pregnancyNames.length; i++)
+                  MenuItemButton(
+                    leadingIcon: selectedPregnancyIndex == i ? Icon(Icons.remove_red_eye) : null,
+                    onPressed: () {
+                      final messenger = ScaffoldMessenger.of(context);
+                      setState(() {
+                        selectedPregnancyIndex = i;
+                      });
+                      messenger.showSnackBar(SnackBar(content: Text('Mostrando ${pregnancyNames[i]}')));
+                    },
+                    child: Text(pregnancyNames[i]),
+                  ),
+                ],
+                if (!hasActiveOwnedPregnancy) ...[
+                  Divider(),
+                  MenuItemButton(
+                    leadingIcon: Icon(Icons.assignment_outlined, color: Color.fromRGBO(183, 28, 28, 1),),
+                    onPressed: () {Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: uid!, firstName: firstName!, birthDate: birthDate!));}, 
+                    child: Text('Registrar un\nEmbarazo', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Color.fromRGBO(183, 28, 28, 1)),)
+                  ),
+                ]
               ],
             ),
+            if (pregnancyNames.isNotEmpty)
             PopupMenuButton<String>(
               icon: Icon(Icons.access_time),
               onSelected: (String newPeriod) {
@@ -333,13 +284,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 )),
               ]
             ),
+            if (pregnancyNames.isNotEmpty)
             PopupMenuButton(
               icon: Icon(Icons.share_outlined),
               onSelected: (String value) {
                 final messenger = ScaffoldMessenger.of(context);
                 switch (value) {
                   case 'Invitar':
-                    Navigator.pushNamed(context, 'ProfileScreen');
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) {
+                        return DraggableScrollableSheet(
+                          expand: false,
+                          maxChildSize: 0.9,
+                          builder: (context, scrollController) {
+                            return InviteSheet(
+                              pregnancyName: pregnancyNames[selectedPregnancyIndex],
+                              pregnancyId: pregnancyId!,
+                            );
+                          }
+                        );
+                      },
+                    );
                     break;
                   case 'Seguidores':
                     showModalBottomSheet(
@@ -385,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: const Text('Acepto'),
                               onPressed: () async {
                                 await PregnancyService().deactivatePregnancy(pregnancyId!);
-                                messenger.showSnackBar(SnackBar(content: Text('${pregnancyNames[selectedPregnancyIndex]} se marco como inactivo')));
+                                messenger.showSnackBar(SnackBar(content: Text('${pregnancyNames[selectedPregnancyIndex]} se marco como archivado')));
                                 dialognavigator.pop();                      
                               },
                             )
@@ -419,11 +386,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ]
               ],
             )
-        ] : [
-          ElevatedButton(
-            onPressed: () {Navigator.pushNamed(context, 'HelpScreen');},
-            child: Text('¿Necesitas Ayuda?'),
-          )
         ]
       ),
     );
@@ -435,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.pushNamed(context, 'MeasurementDialog', arguments: MeasurementDialogArguments(birthDate: birthDate, currentMeasurements: currentMeasurements, pregnancyId: pregnancyId));
         },
-        child: const Icon(Icons.edit),
+        child: const Icon(Icons.add),
       ) : SizedBox.shrink();
     } else {return SizedBox.shrink();}
     // return FloatingActionButton(
@@ -477,34 +439,5 @@ class _HomeScreenState extends State<HomeScreen> {
     //   // },
     //   child: const Icon(Icons.edit),
     // ) : SizedBox.shrink();
-  }
-
-  Widget _suggestionCard({required String title, required String description, required FilledButton button}) {
-    return Card(
-      elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      //margin: const EdgeInsets.only(bottom: 48),
-      child: Padding(
-        padding: const EdgeInsets.all(22),
-        child: Row(
-          children: [
-            Icon(Icons.info_outline, size: 32, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 22),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
-                  const SizedBox(height: 4),
-                  Text(description),
-                  const SizedBox(height: 8),
-                  button
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
   }
 }
