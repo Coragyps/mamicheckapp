@@ -49,16 +49,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  Future<void> _saveColor(Color color) async {
+  Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('favoriteColor', color.value);
-    setState(() => favoriteColor = color);
+    await prefs.setBool('notificationsEnabled', notificationsEnabled);
+
+    if (notificationTime != null) {
+      await prefs.setInt('notificationHour', notificationTime!.hour);
+      await prefs.setInt('notificationMinute', notificationTime!.minute);
+    }
+
+    for (int i = 0; i < daysOfWeek.length; i++) {
+      await prefs.setBool('day_$i', daysOfWeek[i]);
+    }
+
+    if (favoriteColor != null) {
+      await prefs.setInt('favoriteColor', favoriteColor!.value);
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Cambios guardados correctamente')),
+    );
   }
 
-  Future<void> _resetColor() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('favoriteColor');
-    setState(() => favoriteColor = null);
+  void _toggleDay(int index) {
+    setState(() {
+      daysOfWeek[index] = !daysOfWeek[index];
+    });
   }
 
   Future<void> _selectTime() async {
@@ -67,24 +83,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       initialTime: notificationTime ?? TimeOfDay.now(),
     );
     if (picked != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('notificationHour', picked.hour);
-      await prefs.setInt('notificationMinute', picked.minute);
       setState(() => notificationTime = picked);
     }
   }
 
-  void _toggleDay(int index) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      daysOfWeek[index] = !daysOfWeek[index];
-    });
-    await prefs.setBool('day_$index', daysOfWeek[index]);
-  }
-
-  Future<void> _updateNotificationEnabled(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notificationsEnabled', value);
+  void _updateNotificationEnabled(bool value) {
     setState(() {
       notificationsEnabled = value;
       if (!value) {
@@ -93,11 +96,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
+  void _setColor(Color color) {
+    setState(() => favoriteColor = color);
+  }
+
+  void _resetColor() {
+    setState(() => favoriteColor = const Color.fromRGBO(212, 0, 255, 1));
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final themeColor = favoriteColor ?? Color.fromRGBO(212, 0, 255, 1);
-    
+    final themeColor = favoriteColor ?? const Color.fromRGBO(212, 0, 255, 1);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Configuración')),
@@ -106,12 +116,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Card(
             elevation: 0,
-            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            color: scheme.surfaceContainerHigh,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SwitchListTile(
-                  title: Text('Habilitar notificaciones', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                  title: Text('Habilitar notificaciones', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: scheme.onPrimaryFixed)),
                   value: notificationsEnabled,
                   onChanged: _updateNotificationEnabled,
                 ),
@@ -119,16 +129,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: const Text('Hora de alerta'),
                   subtitle: Text(notificationTime?.format(context) ?? 'No establecida'),
                   trailing: ElevatedButton.icon(
-                    label: Text('Cambiar'),
+                    label: const Text('Cambiar'),
                     icon: const Icon(Icons.access_time),
                     onPressed: notificationsEnabled ? _selectTime : null,
                   ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Días para recibir alertas', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                  child: Text('Días para recibir alertas', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: scheme.onPrimaryFixed)),
                 ),
                 const SizedBox(height: 8),
                 Padding(
@@ -140,12 +149,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return FilterChip(
                         label: Text(
                           dayNames[i],
-                          style: TextStyle(
-                            color: daysOfWeek[i] ? Colors.white : null,
-                          ),
+                          style: TextStyle(color: daysOfWeek[i] ? Colors.white : null),
                         ),
                         selected: daysOfWeek[i],
-                        selectedColor: Theme.of(context).colorScheme.primary,
+                        selectedColor: scheme.primary,
                         checkmarkColor: Colors.white,
                         onSelected: (_) => _toggleDay(i),
                       );
@@ -167,14 +174,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 16),
           Card(
-            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            color: scheme.surfaceContainerHigh,
             elevation: 0,
             child: Row(
               children: [
                 ColorPicker(
                   wheelDiameter: 150,
                   color: themeColor,
-                  onColorChanged: _saveColor,
+                  onColorChanged: _setColor,
                   enableShadesSelection: false,
                   pickersEnabled: const <ColorPickerType, bool>{
                     ColorPickerType.wheel: true,
@@ -185,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 Column(
                   children: [
-                    Text('Color de la App', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                    Text('Color de la App', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: scheme.onPrimaryFixed)),
                     const SizedBox(height: 8),
                     FilledButton(
                       onPressed: _resetColor,
@@ -194,6 +201,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Align(
+            alignment: Alignment.center,
+            child: FilledButton.icon(
+              onPressed: _saveSettings,
+              icon: const Icon(Icons.save),
+              label: const Text('Guardar cambios'),
             ),
           ),
         ],
@@ -214,7 +230,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     const notificationDetails = NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
-      0, 'Mamicheck', '¡No te olvides de tu Medición de Hoy! La clave esta en la constancia', notificationDetails,
+      0,
+      'Mamicheck',
+      '¡No te olvides de tu Medición de Hoy! La clave esta en la constancia',
+      notificationDetails,
     );
   }
 }
