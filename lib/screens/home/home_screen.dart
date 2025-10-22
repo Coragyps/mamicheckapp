@@ -123,77 +123,84 @@ class _HomeScreenState extends State<HomeScreen> {
             child: notifications.isNotEmpty ? Icon(Icons.notifications) : Icon(Icons.notifications_outlined),
           ) : Icon(Icons.notifications_outlined)
         ),
-        PopupMenuButton<String>(
-          onSelected: (String value) {
-            final messenger = ScaffoldMessenger.of(context);
-            switch (value) {
-              case 'profile':
-                Navigator.pushNamed(context, 'ProfileScreen');
-                break;
-              case 'config':
-                Navigator.pushNamed(context, 'SettingsScreen');
-                break;
-              case 'api':
-                Navigator.pushNamed(context, 'APITest');
-                break;
-              case 'help':
-                Navigator.pushNamed(context, 'HelpScreen');
-                break;
-              case 'signout':
-                showDialog(
-                  context: context,
-                  builder: (BuildContext dialogContext) {
-                    final dialognavigator = Navigator.of(dialogContext);
-                    return AlertDialog(
-                      title: const Text('¿Deseas cerrar sesión?'),
-                      content: const Text('Si continuas, se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.\n\nTendrás que volver a acceder para usar el resto de funciones.'),
-                      actions: [
-                        FilledButton(
-                          child: const Text('No, Gracias'),
-                          onPressed: () {
-                            dialognavigator.pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text('Acepto'),
-                          onPressed: () async {
-                            dialognavigator.pop();
-                            await Future.delayed(Duration.zero);
-                            await AuthService().signout();                              
-                          },
-                        )
-                      ], 
-                    );
-                  }
-                );
-                break;                
-              default:
-                messenger.showSnackBar(
-                  SnackBar(content: Text('¡Acción "$value" no existe!'))
-                );
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(value: 'profile', child: Row(
-              children: [Icon(Icons.person_outline), SizedBox(width: 8,), Text('Mi Perfil')],
-            )),
-            const PopupMenuItem<String>(value: 'config', child: Row(
-              children: [Icon(Icons.settings_outlined), SizedBox(width: 8,), Text('Configuración')],
-            )),
-            const PopupMenuDivider(),
-            const PopupMenuItem<String>(value: 'help', child: Row(
-              children: [Icon(Icons.help_outline), SizedBox(width: 8,), Text('Ayuda')],
-            )),
-            const PopupMenuDivider(),
-            const PopupMenuItem<String>(value: 'signout', child: Row(
-              children: [Icon(Icons.logout, color: Color.fromRGBO(183, 28, 28, 1)), SizedBox(width: 8,), Text('Cerrar Sesión', style: TextStyle(color: Color.fromRGBO(183, 28, 28, 1)))],
-            )),
-          ],
+        IconButton(
           icon: firstName != null && lastName != null && uid != null ? CircleAvatar(
             backgroundColor: Colors.primaries[uid.hashCode.abs() % Colors.primaries.length].shade900,
             child: Text(firstName[0].toUpperCase() + lastName[0].toUpperCase(), style: TextStyle(color: Colors.primaries[uid.hashCode.abs() % Colors.primaries.length].shade100)),
-          ) : CircleAvatar(backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest)
+          ) : CircleAvatar(backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest),
+          onPressed: () {Navigator.pushNamed(context, 'ProfileScreen');},
         )
+        // PopupMenuButton<String>(
+        //   onSelected: (String value) {
+        //     final messenger = ScaffoldMessenger.of(context);
+        //     switch (value) {
+        //       case 'profile':
+        //         Navigator.pushNamed(context, 'ProfileScreen');
+        //         break;
+        //       case 'config':
+        //         Navigator.pushNamed(context, 'SettingsScreen');
+        //         break;
+        //       case 'api':
+        //         Navigator.pushNamed(context, 'APITest');
+        //         break;
+        //       case 'help':
+        //         Navigator.pushNamed(context, 'HelpScreen');
+        //         break;
+        //       case 'signout':
+        //         showDialog(
+        //           context: context,
+        //           builder: (BuildContext dialogContext) {
+        //             final dialognavigator = Navigator.of(dialogContext);
+        //             return AlertDialog(
+        //               title: const Text('¿Deseas cerrar sesión?'),
+        //               content: const Text('Si continuas, se cerrará la sesión de tu cuenta y volverás a la pantalla de inicio.\n\nTendrás que volver a acceder para usar el resto de funciones.'),
+        //               actions: [
+        //                 FilledButton(
+        //                   child: const Text('No, Gracias'),
+        //                   onPressed: () {
+        //                     dialognavigator.pop();
+        //                   },
+        //                 ),
+        //                 TextButton(
+        //                   child: const Text('Acepto'),
+        //                   onPressed: () async {
+        //                     dialognavigator.pop();
+        //                     await Future.delayed(Duration.zero);
+        //                     await AuthService().signout();                              
+        //                   },
+        //                 )
+        //               ], 
+        //             );
+        //           }
+        //         );
+        //         break;                
+        //       default:
+        //         messenger.showSnackBar(
+        //           SnackBar(content: Text('¡Acción "$value" no existe!'))
+        //         );
+        //     }
+        //   },
+        //   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        //     const PopupMenuItem<String>(value: 'profile', child: Row(
+        //       children: [Icon(Icons.person_outline), SizedBox(width: 8,), Text('Mi Perfil')],
+        //     )),
+        //     const PopupMenuItem<String>(value: 'config', child: Row(
+        //       children: [Icon(Icons.settings_outlined), SizedBox(width: 8,), Text('Configuración')],
+        //     )),
+        //     const PopupMenuDivider(),
+        //     const PopupMenuItem<String>(value: 'help', child: Row(
+        //       children: [Icon(Icons.help_outline), SizedBox(width: 8,), Text('Ayuda')],
+        //     )),
+        //     const PopupMenuDivider(),
+        //     const PopupMenuItem<String>(value: 'signout', child: Row(
+        //       children: [Icon(Icons.logout, color: Color.fromRGBO(183, 28, 28, 1)), SizedBox(width: 8,), Text('Cerrar Sesión', style: TextStyle(color: Color.fromRGBO(183, 28, 28, 1)))],
+        //     )),
+        //   ],
+        //   icon: firstName != null && lastName != null && uid != null ? CircleAvatar(
+        //     backgroundColor: Colors.primaries[uid.hashCode.abs() % Colors.primaries.length].shade900,
+        //     child: Text(firstName[0].toUpperCase() + lastName[0].toUpperCase(), style: TextStyle(color: Colors.primaries[uid.hashCode.abs() % Colors.primaries.length].shade100)),
+        //   ) : CircleAvatar(backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest)
+        // )
       ],
     );
   }
@@ -376,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [Icon(Icons.view_list_outlined), SizedBox(width: 8,), Text('Ver Mediciones')],
                 )),
                 const PopupMenuItem<String>(value: 'Exportar a PDF', child: Row(
-                  children: [Icon(Icons.task_outlined), SizedBox(width: 8,), Text('Exportar a PDF')],
+                  children: [Icon(Icons.task_outlined), SizedBox(width: 8,), Text('Ayuda')],
                 )),
                 if (pregnancyIsActive! && pregnancyFollowers![uid] == 'owner') ...[
                   const PopupMenuDivider(),

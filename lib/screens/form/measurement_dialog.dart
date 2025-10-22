@@ -58,11 +58,11 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
 
   PreferredSizeWidget _titlebar(BuildContext context) {
     return AppBar(
-      title: const Text('Nueva Medición'),
+      title: Text('Nueva Medición'),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 16),
-          child: FilledButton(
+          child: TextButton(
             onPressed: _handleCreateMeasurement,
             child: const Text('Guardar'),
           ),
@@ -71,7 +71,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
     );
   }
 
-  Widget _body(BuildContext context) {
+  Widget _body(BuildContext context) {  
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -111,9 +111,9 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                           keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value!.trim().isEmpty) return 'Este campo es obligatorio';
-                            final parsed = int.tryParse(value.trim());
-                            if (parsed == null) return 'Debe ser un número entero';
-                            if (parsed < 80 || parsed > 200) return 'Debe estar entre 80 y 200';
+                            final systolic = int.tryParse(value.trim());
+                            if (systolic == null) return 'Debe ser un número entero';
+                            if (systolic < 80 || systolic > 200) return 'Debe estar entre 80 y 200';
                             return null;
                           },
                         ),
@@ -125,9 +125,15 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                           keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value!.trim().isEmpty) return 'Este campo es obligatorio';
-                            final parsed = int.tryParse(value.trim());
-                            if (parsed == null) return 'Debe ser un número entero';
-                            if (parsed < 50 || parsed > 130) return 'Debe estar entre 50 y 130';
+                            final diastolic = int.tryParse(value.trim());
+                            if (diastolic == null) return 'Debe ser un número entero';
+                            if (diastolic < 50 || diastolic > 130) return 'Debe estar entre 50 y 130';
+
+                            final systolic = int.tryParse(_systolicController.text.trim());
+                            if (systolic != null && diastolic >= systolic) {
+                              return 'La presión diastólica debe ser menor a la sistólica';
+                            }
+                            
                             return null;
                           },
                         ),
@@ -269,7 +275,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
     setState(() => _isSaving = true);
 
     final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context, rootNavigator: true);
+    final navigator = Navigator.of(context);
     int? riskLevel;
 
     try {

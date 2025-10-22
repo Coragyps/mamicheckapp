@@ -2,33 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
 import 'package:mamicheckapp/screens/screens.dart';
 
-// class AppRouting {
-//   static Map<String, Widget Function(BuildContext)> getRoutes() {
-//     Map<String, Widget Function(BuildContext)> appRoute = {};
-
-//     appRoute.addAll({
-//       "LoginScreen":(BuildContext context) => LoginScreen(),
-//       "RegisterScreen":(BuildContext context) => const RegisterScreen(),
-
-//       "MeasurementsScreen":(BuildContext context) => MeasurementsScreen(),
-
-//       "APITest":(BuildContext context) => ApiTest(),
-//       "MyHomePage": (BuildContext context) {
-//         final args = ModalRoute.of(context)!.settings.arguments as MyHomePageArguments;
-//         return MyHomePage(title: args.title);
-//       },
-
-//       "HomeScreen":(BuildContext context) => HomeScreen(),
-
-//       "HelpScreen":(BuildContext context) => HelpScreen(),
-//       "NotificationScreen":(BuildContext context) => NotificationScreen(),
-//       "ProfileScreen":(BuildContext context) => ProfileScreen(),
-//       "SettingsScreen":(BuildContext context) => SettingsScreen() 
-//     });
-//     return appRoute;
-//   }
-// }
-
 class AppRouting {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -85,7 +58,7 @@ class AppRouting {
         return MaterialPageRoute(builder: (_) => SettingsScreen());
 
       default:
-        return MaterialPageRoute(builder: (_) => const SettingsScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
     }
   }
 }

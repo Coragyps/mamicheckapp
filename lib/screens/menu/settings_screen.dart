@@ -2,6 +2,7 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mamicheckapp/main.dart';
+import 'package:mamicheckapp/services/notification_scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,6 +65,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (favoriteColor != null) {
       await prefs.setInt('favoriteColor', favoriteColor!.value);
+    }
+
+    if (notificationsEnabled && notificationTime != null) {
+      await scheduleWeeklyNotifications(notificationTime!, daysOfWeek);
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

@@ -35,8 +35,10 @@ class _MeasurementsScreenState extends State<MeasurementsScreen> {
               children: [
                 FilledButton.icon(
                   icon: const Icon(Icons.task_outlined),
-                  onPressed: () {},
-                  label: const Text('Exportar a PDF'),
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'HelpScreen');
+                  },
+                  label: const Text('Ayuda'),
                 ),
               ],
             ),
