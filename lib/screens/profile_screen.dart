@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mamicheckapp/main.dart';
 import 'package:mamicheckapp/models/user_model.dart';
-import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:mamicheckapp/services/authentication_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

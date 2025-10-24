@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/dialogs/register_dialog.dart';
-import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:mamicheckapp/services/authentication_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
