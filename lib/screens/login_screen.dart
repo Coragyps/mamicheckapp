@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mamicheckapp/screens/access/register_dialog.dart';
+import 'package:mamicheckapp/dialogs/register_dialog.dart';
 import 'package:mamicheckapp/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
