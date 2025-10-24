@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
-import 'package:mamicheckapp/all_screens.dart';
+import 'package:mamicheckapp/screens.dart';
 
 class AppRouting {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

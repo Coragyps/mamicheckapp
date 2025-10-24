@@ -4,10 +4,9 @@ import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
 import 'package:mamicheckapp/models/user_model.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
-import 'package:mamicheckapp/sheets/invite_sheet.dart';
+import 'package:mamicheckapp/sheets/pregnancy_followers_create_sheet.dart';
 import 'package:mamicheckapp/screens/content_screen.dart';
-import 'package:mamicheckapp/sheets/followers_sheet.dart';
-import 'package:mamicheckapp/services/authentication_service.dart';
+import 'package:mamicheckapp/sheets/pregnancy_followers_list_sheet.dart';
 import 'package:mamicheckapp/services/pregnancy_service.dart';
 import 'package:provider/provider.dart';
 

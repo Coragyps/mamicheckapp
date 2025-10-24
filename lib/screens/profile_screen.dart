@@ -143,7 +143,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print('📱 Notification status: $notificationStatus');
       print('⏰ Schedule status: $scheduleStatus');
       
-      // Mostrar estado actual
       String message = '';
       if (notificationStatus.isGranted && scheduleStatus.isGranted) {message = '✅ Todos los permisos están concedidos';} 
       else if (notificationStatus.isGranted) {message = '⚠️ Solo notificaciones concedidas. Faltan alarmas exactas';} 

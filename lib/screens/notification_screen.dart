@@ -39,7 +39,7 @@ class NotificationScreen extends StatelessWidget {
                 ),
               ),
             )
-            : Container(
+            : SizedBox(
               height: 200,
               child: ListView.builder(
                   itemCount: notifications.length,

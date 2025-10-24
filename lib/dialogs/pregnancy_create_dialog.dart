@@ -282,7 +282,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                             labelText: 'Tipo de embarazo',
                             border: OutlineInputBorder(),
                           ),
-                          value: _fetalCount,
+                          initialValue: _fetalCount,
                           onChanged: _isSaving ? null : (val) => setState(() => _fetalCount = val!),
                           items: [
                             {'label': 'Aún no sé', 'value': 0},

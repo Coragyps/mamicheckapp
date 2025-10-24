@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/models/measurement_model.dart';
 import 'package:mamicheckapp/models/pregnancy_model.dart';
-import 'package:mamicheckapp/sheets/measurement_sheet.dart';
+import 'package:mamicheckapp/sheets/measurement_edit_sheet.dart';
 import 'package:provider/provider.dart';
 
 class MeasurementsScreen extends StatefulWidget {
