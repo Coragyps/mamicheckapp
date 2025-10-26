@@ -4,6 +4,7 @@ export 'package:mamicheckapp/dialogs/user_create_dialog.dart';
 export 'package:mamicheckapp/screens/table_screen.dart';
 
 export 'package:mamicheckapp/sheets/measurement_edit_sheet.dart';
+export 'package:mamicheckapp/sheets/user_password_edit_sheet.dart';
 export 'package:mamicheckapp/dialogs/measurement_create_dialog.dart';
 export 'package:mamicheckapp/dialogs/pregnancy_create_dialog.dart';
 

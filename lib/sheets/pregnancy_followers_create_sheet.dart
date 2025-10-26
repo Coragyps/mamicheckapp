@@ -37,7 +37,7 @@ class _InviteSheetState extends State<InviteSheet> {
           ),
           const SizedBox(height: 12),
           ElevatedButton.icon(
-          onPressed: isLoading ? null : () async {
+          onPressed: () async {
             final email = _emailController.text.trim();
 
             if (email.isEmpty) {

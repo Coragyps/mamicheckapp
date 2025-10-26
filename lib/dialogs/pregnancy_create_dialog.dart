@@ -381,7 +381,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
                             labelText: 'Historial de diabetes',
                             border: OutlineInputBorder(),
                           ),
-                          value: _diabetesHistory,
+                          initialValue: _diabetesHistory,
                           onChanged: _isSaving ? null : (val) => setState(() => _diabetesHistory = val!),
                           items: ['Ninguno', 'Diabetes Tipo 1', 'Diabetes Tipo 2']
                               .map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
