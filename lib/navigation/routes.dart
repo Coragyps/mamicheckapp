@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/navigation/arguments.dart';
-import 'package:mamicheckapp/screens/screens.dart';
+import 'package:mamicheckapp/screens.dart';
 
 class AppRouting {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -18,15 +18,6 @@ class AppRouting {
       case 'MeasurementsScreen':
         final args = settings.arguments as MeasurementsScreenArguments;
         return MaterialPageRoute(builder: (_) => MeasurementsScreen(pregnancyId: args.pregnancyId));
-
-      case 'APITest':
-        return MaterialPageRoute(builder: (_) => ApiTest());
-
-      case 'MyHomePage':
-        final args = settings.arguments as MyHomePageArguments;
-        return MaterialPageRoute(
-          builder: (_) => MyHomePage(title: args.title),
-        ); 
 
       case 'MeasurementDialog':
         final args = settings.arguments as MeasurementDialogArguments;
@@ -53,9 +44,6 @@ class AppRouting {
 
       case 'ProfileScreen':
         return MaterialPageRoute(builder: (_) => ProfileScreen());
-
-      case 'SettingsScreen':
-        return MaterialPageRoute(builder: (_) => SettingsScreen());
 
       default:
         return MaterialPageRoute(builder: (_) => const HomeScreen());

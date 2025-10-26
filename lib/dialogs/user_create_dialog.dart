@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mamicheckapp/models/user_model.dart';
-import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:mamicheckapp/services/authentication_service.dart';
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/services/user_service.dart';
 

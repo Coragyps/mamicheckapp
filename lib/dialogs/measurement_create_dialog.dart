@@ -276,6 +276,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
 
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    final tempcontext = context;
     int? riskLevel;
 
     try {
@@ -344,7 +345,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
       // Mostrar diálogo dentro de la app
       if (context.mounted) {
         await showDialog(
-          context: context,
+          context: tempcontext,
           builder: (_) => AlertDialog(
             title: const Text('¡Atención!'),
             content: const Text(

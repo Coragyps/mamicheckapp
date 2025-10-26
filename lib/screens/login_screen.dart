@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mamicheckapp/screens/access/register_dialog.dart';
-import 'package:mamicheckapp/services/auth_service.dart';
+import 'package:mamicheckapp/dialogs/user_create_dialog.dart';
+import 'package:mamicheckapp/screens.dart';
+import 'package:mamicheckapp/services/authentication_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,17 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   toolbarHeight: 75,
-      //   centerTitle: true,
-      //   title: ListTile(
-      //     leading: Image(image: AssetImage('assets/img/logo.png'), fit: BoxFit.contain),
-      //     title: Text('Mamicheck'),
-      //     titleTextStyle: Theme.of(context).textTheme.displayMedium?.copyWith(fontFamily: 'caveat', color: Color(0xffCA3E7F), height: 0.9),
-      //     subtitle: Text('Tu Aliado en el Embarazo'),
-      //     subtitleTextStyle: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.onPrimaryFixed),
-      //   ),
-      // ),
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -112,13 +102,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     )
                   ],
                 ),
-                // FilledButton(
-                //   onPressed: () {
-                //     _emailController.text = 'mamicheckroot@gmail.com';
-                //     _passwordController.text = '123456';
-                //     _handleSignin(context);
-                //   }, child: const Text("mamicheckroot (debug)"),
-                // )
+                FilledButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) {
+                        return DraggableScrollableSheet(
+                          expand: false,
+                          maxChildSize: 0.9,
+                          builder: (context, scrollController) {
+                            return UserPasswordEditSheet();
+                          }
+                        );
+                      },
+                    );
+                  },
+                  child: const Text("Olvide mi Contraseña"),
+                )
               ],
             ),
           ),
