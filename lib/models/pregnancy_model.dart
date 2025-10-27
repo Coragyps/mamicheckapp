@@ -224,7 +224,6 @@ class PregnancyModel {
   final List<String>? riskFactors;
   
   final Map<String, String> followers;
-  //final List<Map<String, dynamic>> measurements;
   final List<MeasurementModel> measurements;
 
   PregnancyModel({
@@ -250,7 +249,6 @@ class PregnancyModel {
       riskFactors: List<String>.from(data['riskFactors']),
 
       followers: Map<String, String>.from(data['followers'] ?? {}),
-      //measurements: List<Map<String, dynamic>>.from(data['measurements'] ?? []),
       measurements: (data['measurements'] as List<dynamic>? ?? []).map((m) => MeasurementModel.fromFirestore(Map<String, dynamic>.from(m))).toList(),
     );
   }

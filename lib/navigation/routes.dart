@@ -11,7 +11,7 @@ class AppRouting {
       
       case 'RegisterDialog':
         return MaterialPageRoute(
-          fullscreenDialog: true, // estilo Material 3 para formularios
+          fullscreenDialog: true,
           builder: (_) => const RegisterDialog(),
         );
 

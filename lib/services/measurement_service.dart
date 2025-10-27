@@ -18,14 +18,8 @@ class MeasurementService {
     );
 
     if (index == -1) {throw Exception('La medición a editar no existe.');}
-
-    // Reemplazamos la medición
     currentMeasurements[index] = updatedMeasurement;
-
-    // Guardamos en Firestore
-    await _db.collection('pregnancies').doc(pregnancyId).update({
-      'measurements': currentMeasurements.map((m) => m.toMap()).toList()
-    });
+    await _db.collection('pregnancies').doc(pregnancyId).update({'measurements': currentMeasurements.map((m) => m.toMap()).toList()});
   }
 
   ///nueva version
@@ -34,8 +28,6 @@ class MeasurementService {
       return m.date == updatedMeasurement.date ? updatedMeasurement : m;
     }).toList();
 
-    await FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId).update({
-      'measurements': updatedList.map((m) => m.toMap()).toList(),
-    });
+    await FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId).update({'measurements': updatedList.map((m) => m.toMap()).toList(),});
   }
 }

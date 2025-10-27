@@ -35,7 +35,6 @@ class PregnancyService {
         .where('ownerId', isEqualTo: uid)
         .get();
 
-    // Combinar sin duplicados
     final allDocs = {...querySnapshot.docs, ...ownerQuerySnapshot.docs};
     return allDocs.map((doc) => PregnancyModel.fromFirestore(doc)).toList();
   }

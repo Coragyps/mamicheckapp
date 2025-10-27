@@ -100,11 +100,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final daysList = selectedDays.map((entry) => dayNames[entry.key]).join(', ');
       contextNotifications.showSnackBar(
-        SnackBar(content: Text('✅ Recordatorios programados: $daysList a las ${notificationTime!.format(context)}'),),
+        SnackBar(content: Text('✅ Recordatorios programados: $daysList a las ${notificationTime!}'),),
       );
       
     } catch (e) {
-      print('❌ Error programando notificaciones: $e');
       contextNotifications.showSnackBar(SnackBar(content: Text('Error al programar recordatorios: $e')),);
     }
   }
@@ -140,8 +139,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final notificationStatus = await Permission.notification.status;
       final scheduleStatus = await Permission.scheduleExactAlarm.status;
-      print('📱 Notification status: $notificationStatus');
-      print('⏰ Schedule status: $scheduleStatus');
       
       String message = '';
       if (notificationStatus.isGranted && scheduleStatus.isGranted) {message = '✅ Todos los permisos están concedidos';} 
@@ -153,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Si faltan permisos, ofrecer solicitarlos
       if (!notificationStatus.isGranted || !scheduleStatus.isGranted) {_showPermissionDialog('los permisos faltantes');}
       
-    } catch (e) {print('Error: $e');contextPermissions.showSnackBar(SnackBar(content: Text('Error: $e')));}
+    } catch (e) {contextPermissions.showSnackBar(SnackBar(content: Text('Error: $e')));}
   }
 
   void _showPermissionDialog(String permissionType) {
@@ -364,9 +361,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   spacing: 0,
                   children: [
-                    ListTile(
-                      title: Text('Configura la hora y dias de la semana para que te enviemos recordatorios según tu disponibilidad', style: Theme.of(context).textTheme.labelMedium),
-                    ),
+                    ListTile(title: Text('Configura la hora y dias de la semana para que te enviemos recordatorios según tu disponibilidad', style: Theme.of(context).textTheme.labelMedium)),
                   ],
                 ),
               ),
@@ -449,6 +444,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           TextButton(
                             child: const Text('Acepto'),
                             onPressed: () async {
+                              await flutterLocalNotificationsPlugin.cancelAll();
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.clear();
                               dialognavigator.pop();
                               await Future.delayed(Duration.zero);
                               await AuthService().signout();                              
@@ -463,14 +461,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             ),
 
-TextButton(
-  onPressed: _testImmediateNotification,
-  child: Text('Test Timezone'),
-),
-TextButton(
-  onPressed: _testTimezone2,
-  child: Text('Test Timezone2 eeeeeeeeeeee'),
-),
+            // TextButton(
+            //   onPressed: _testImmediateNotification,
+            //   child: Text('Notificacion 10 Segundos'),
+            // ),
+            // TextButton(
+            //   onPressed: _testTimezone2,
+            //   child: Text('Ver Notificaciones Pendientes'),
+            // ),
 
             const SizedBox(height: 72),
           ],
@@ -499,81 +497,80 @@ TextButton(
     );
   }
 
-  Future<void> _testImmediateNotification() async {
-    try {
-      final testTime = tz.TZDateTime.now(tz.local).add(Duration(seconds: 10));
+  // Future<void> _testImmediateNotification() async {
+  //   try {
+  //     final testTime = tz.TZDateTime.now(tz.local).add(Duration(seconds: 10));
       
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        999,
-        '🧪 TEST INMEDIATO',
-        'Si ves esto, las notificaciones programadas funcionan!',
-        testTime,
-        // ✅ USAR EL CANAL QUE SABEMOS QUE FUNCIONA
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'mamicheck_channel',        // ← Mismo canal
-            'Mamicheck Notificaciones',
-            channelDescription: 'Notificaciones de ejemplo',
-            importance: Importance.max,
-            priority: Priority.max,
-            ticker: 'ticker',
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      );
+  //     await flutterLocalNotificationsPlugin.zonedSchedule(
+  //       999,
+  //       '🧪 TEST INMEDIATO',
+  //       'Si ves esto, las notificaciones programadas funcionan!',
+  //       testTime,
+  //       const NotificationDetails(
+  //         android: AndroidNotificationDetails(
+  //           'mamicheck_channel',        // ← Mismo canal
+  //           'Mamicheck Notificaciones',
+  //           channelDescription: 'Notificaciones de ejemplo',
+  //           importance: Importance.max,
+  //           priority: Priority.max,
+  //           ticker: 'ticker',
+  //         ),
+  //       ),
+  //       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+  //       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+  //     );
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('⏱️ Test con canal conocido programado para 10 segundos')),
-      );
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('⏱️ Test con canal conocido programado para 10 segundos')),
+  //     );
       
-    } catch (e) {
-      print('Error test: $e');
-    }
-  }
+  //   } catch (e) {
+  //     print('Error test: $e');
+  //   }
+  // }
 
 
-  Future<void> _testTimezone2() async {
+//   Future<void> _testTimezone2() async {
 
-  try {
-    final pending = await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-    print('📱 Total pendientes: ${pending.length}');
-    
-    if (pending.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ No hay notificaciones pendientes - no se programaron')),
-      );
-    } else {
-      for (var notification in pending) {
-        print('✅ ID ${notification.id}: ${notification.title}');
-        print('   Payload: ${notification.payload}');
-      }
+//     try {
+//       final pending = await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+//       print('📱 Total pendientes: ${pending.length}');
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('📱 ${pending.length} notificaciones están programadas')),
-      );
-    }
-  } catch (e) {
-    print('Error verificando: $e');
-  }
+//       if (pending.isEmpty) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('❌ No hay notificaciones pendientes - no se programaron')),
+//         );
+//       } else {
+//         for (var notification in pending) {
+//           print('✅ ID ${notification.id}: ${notification.title}');
+//           print('   Payload: ${notification.payload}');
+//         }
+        
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('📱 ${pending.length} notificaciones están programadas')),
+//         );
+//       }
+//     } catch (e) {
+//       print('Error verificando: $e');
+//     }
 
-  _checkNotificationPermissions();
-}
+//     _checkNotificationPermissions();
+//   }
 
-Future<void> _checkNotificationPermissions() async {
-  // Verificar si pueden mostrar notificaciones
-  final plugin = flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+// Future<void> _checkNotificationPermissions() async {
+//   // Verificar si pueden mostrar notificaciones
+//   final plugin = flutterLocalNotificationsPlugin
+//       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
       
-  final bool? result = await plugin?.areNotificationsEnabled();
-  print('📱 Notificaciones habilitadas: $result');
+//   final bool? result = await plugin?.areNotificationsEnabled();
+//   print('📱 Notificaciones habilitadas: $result');
   
-  if (result == false) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('❌ Las notificaciones están deshabilitadas en el sistema')),
-    );
-  }
-}
+//   if (result == false) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('❌ Las notificaciones están deshabilitadas en el sistema')),
+//     );
+//   }
+// }
 
 
 

@@ -189,7 +189,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                     onPressed: () {
                       _temperatureController.text = '37';
                     },
-                    icon: Icon(Icons.info_outline),
+                    icon: Icon(Icons.auto_fix_high_outlined),
                   ),
                 ],
               ),
@@ -226,7 +226,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                     onPressed: () {
                       _bloodSugarController.text = '4';
                     },
-                    icon: Icon(Icons.info_outline),
+                    icon: Icon(Icons.auto_fix_high_outlined),
                   ),
                 ],
               ),
