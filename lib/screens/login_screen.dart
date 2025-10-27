@@ -296,10 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         minChildSize: 0.4,
                                         expand: false,
                                         builder: (context, scrollController) {
-                                          return Container(
-                                            decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(28))),
-                                            child: Center(child: UserPasswordEditSheet()),
-                                          );
+                                          return Center(child: UserPasswordEditSheet());
                                         },
                                       );
                                     },

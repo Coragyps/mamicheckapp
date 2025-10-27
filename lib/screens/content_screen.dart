@@ -75,68 +75,8 @@ class _ContentScreenState extends State<ContentScreen> {
             buildRiskHeatmapCard(widget.filteredMeasurements, widget.pregnancy?.lastMenstrualPeriod ?? DateTime.now(), widget.selectedPeriod),
             SizedBox(height: 50),
           
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12),
-          //   child: Text('Factores de Riesgo',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12),
-          //   child: Text('Ante otras enfermedades hipertensivas del embarazo'),
-          // ),
-          // const SizedBox(height: 8),
           _buildRiskFactorList(widget.pregnancy?.riskFactors ?? []),
           SizedBox(height: 12),
-          // Divider(),
-          // const SizedBox(height: 8),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12),
-          //   child: Text('Mas Opciones',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
-          // ),
-          // const SizedBox(height: 18),
-          // TextButton.icon(
-          //   onPressed: () {Navigator.pushNamed(context, 'MeasurementsScreen', arguments: MeasurementsScreenArguments(pregnancyId: widget.pregnancy.id));},
-          //   icon: const Icon(Icons.view_list_outlined),
-          //   label: const Text('Ver tabla de Mediciones'),
-          //   style: TextButton.styleFrom(minimumSize: Size.zero, padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6), tapTargetSize: MaterialTapTargetSize.shrinkWrap,),
-          // ),
-          // if (widget.pregnancy.isActive && widget.pregnancy.followers[widget.uid] == 'owner')
-          // TextButton.icon(
-          //   onPressed: () {
-          //     showDialog(
-          //       context: context,
-          //       builder: (BuildContext dialogContext) {
-          //         final dialognavigator = Navigator.of(dialogContext);
-          //         final messenger = ScaffoldMessenger.of(context);
-          //         return AlertDialog(
-          //           title: const Text('¿Dejar de monitorear este Embarazo?'),
-          //           content: const Text('Si continuas, no se podra volver a añadir mediciones a este embarazo y se marcara como archivado'),
-          //           actions: [
-          //             FilledButton(
-          //               child: const Text('No, Gracias'),
-          //               onPressed: () {
-          //                 dialognavigator.pop();
-          //               },
-          //             ),
-          //             TextButton(
-          //               child: const Text('Acepto'),
-          //               onPressed: () async {
-          //                 await PregnancyService().deactivatePregnancy(widget.pregnancy.id);
-          //                 messenger.showSnackBar(SnackBar(content: Text('${widget.pregnancy.name} se marco como archivado')));
-          //                 dialognavigator.pop();                      
-          //               },
-          //             )
-          //           ], 
-          //         );
-          //       }
-          //     );
-          //   },
-          //   icon: const Icon(Icons.archive_outlined),
-          //   label: const Text('Archivar Embarazo'),
-          //   style: TextButton.styleFrom(minimumSize: Size.zero, padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6), tapTargetSize: MaterialTapTargetSize.shrinkWrap,),
-          // ),
-          // if (widget.pregnancy != null && widget.uid != null && widget.firstName != null && widget.birthDate != null) {
-            
-          // }
         ],
       ),
     );

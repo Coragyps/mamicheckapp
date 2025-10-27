@@ -12,7 +12,7 @@ class NotificationScreen extends StatelessWidget {
     final userModel = context.watch<UserModel?>();
     final messenger = ScaffoldMessenger.of(context);
     final notifications = userModel?.notifications ?? [];
-
+    const separator = '||';
     return Scaffold(
       appBar: AppBar(title: const Text('Notificaciones')),
       body: SingleChildScrollView(
@@ -91,12 +91,22 @@ class NotificationScreen extends StatelessWidget {
                                       label: const Text('Aceptar'),
                                       onPressed: () async {
                                         final uid = userModel?.uid;
+                                        final firstname = userModel?.firstName ?? 'Desconocido';
+                                        final lastname = userModel?.lastName ?? 'Desconocido';
+                                        final emailadress = userModel?.email ?? 'Correo Desconocido';
                                         if (uid == null) return;
+
+                                        final followerData = 
+                                        'companion$separator'
+                                        '$emailadress$separator'
+                                        '$firstname$separator'
+                                        '$lastname';
                       
                                         try {
                                           await PregnancyService().addFollower(
                                             notif['pregnancyId'],
                                             uid,
+                                            followerData,
                                           );
                                           await UserService().deleteNotification(
                                             uid: uid,

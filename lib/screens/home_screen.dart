@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
     final now = DateTime.now();
     final bool isLoading = pregnancies.length == 1 && pregnancies.first.id == 'dummy';
-    final bool hasActiveOwnedPregnancy = userModel != null && pregnancies.isNotEmpty && pregnancies.first.isActive && pregnancies.first.followers[userModel.uid] == 'owner';
+    final bool hasActiveOwnedPregnancy = userModel != null && pregnancies.isNotEmpty && pregnancies.first.isActive && _extractRole(pregnancies.first.followers[userModel.uid]) == 'owner';
 
     final filteredMeasurements = switch (selectedPeriod) {
       'Últimos 7 Días' => selectedPregnancy?.measurements.where((m) => now.difference(m.date).inDays <= 7).toList(),
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(userModel?.firstName, userModel?.lastName, userModel?.uid, userModel?.notifications),  
-      bottomNavigationBar: _buildBottomAppBar(userModel?.uid, pregnancies.map((p) => p.name).toList(), selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers, hasActiveOwnedPregnancy, userModel?.firstName, userModel?.birthDate),
+      bottomNavigationBar: _buildBottomAppBar(userModel?.uid, pregnancies.map((p) => p.name).toList(), selectedPregnancy?.id, selectedPregnancy?.isActive, selectedPregnancy?.followers, hasActiveOwnedPregnancy, userModel?.firstName, userModel?.birthDate, userModel?.lastName, userModel?.email),
       body: isLoading ? Center(child: CircularProgressIndicator()) : pregnancies.isEmpty && userModel != null ?
       Center(
         child: Column(
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: const Icon(Icons.playlist_add),
                 label: const Text('Registrar mi Embarazo'),
                 onPressed: () {
-                  Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: userModel.uid, firstName: userModel.firstName, birthDate: userModel.birthDate));
+                  Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: userModel.uid, firstName: userModel.firstName, birthDate: userModel.birthDate, email: userModel.email, lastName:userModel.lastName));
                 },
               )
             ),
@@ -204,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomAppBar(String? uid, List<String>? pregnancyNames, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers, bool hasActiveOwnedPregnancy, String? firstName, DateTime? birthDate) {
+  Widget _buildBottomAppBar(String? uid, List<String>? pregnancyNames, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers, bool hasActiveOwnedPregnancy, String? firstName, DateTime? birthDate, String? lastName, String? email) {
     return BottomAppBar(
       //olor: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Row(
@@ -240,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Divider(),
                   MenuItemButton(
                     leadingIcon: Icon(Icons.assignment_outlined, color: Color.fromRGBO(183, 28, 28, 1),),
-                    onPressed: () {Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: uid!, firstName: firstName!, birthDate: birthDate!));}, 
+                    onPressed: () {Navigator.pushNamed(context, 'PregnancyDialog', arguments: PregnancyDialogArguments(uid: uid!, firstName: firstName!, birthDate: birthDate!, lastName: lastName!, email: email!));}, 
                     child: Text('Registrar un\nEmbarazo', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Color.fromRGBO(183, 28, 28, 1)),)
                   ),
                 ]
@@ -303,11 +303,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (context) {
                         return DraggableScrollableSheet(
                           expand: false,
-                          maxChildSize: 0.9,
+                          minChildSize: 0.4,
+                          initialChildSize: 0.7,
                           builder: (context, scrollController) {
-                            return InviteSheet(
-                              pregnancyName: pregnancyNames[selectedPregnancyIndex],
-                              pregnancyId: pregnancyId!,
+                            return Center(
+                              child: InviteSheet(
+                                pregnancyName: pregnancyNames[selectedPregnancyIndex],
+                                pregnancyId: pregnancyId!,
+                                followers: pregnancyFollowers!
+                              ),
                             );
                           }
                         );
@@ -321,7 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (context) {
                         return DraggableScrollableSheet(
                           expand: false,
-                          maxChildSize: 0.9,
+                          minChildSize: 0.4,
+                          initialChildSize: 0.7,
                           builder: (context, scrollController) {
                             return FollowersSheet(
                               scrollController: scrollController,
@@ -384,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const PopupMenuItem<String>(value: 'Exportar a PDF', child: Row(
                   children: [Icon(Icons.task_outlined), SizedBox(width: 8,), Text('Ayuda')],
                 )),
-                if (pregnancyIsActive! && pregnancyFollowers![uid] == 'owner') ...[
+                if (pregnancyIsActive! && _extractRole(pregnancyFollowers![uid]) == 'owner') ...[
                   const PopupMenuDivider(),
                   const PopupMenuItem<String>(value: 'Archivar', child: Row(
                     children: [Icon(Icons.archive_outlined, color: Color.fromRGBO(183, 28, 28, 1)), SizedBox(width: 8,), Text('Archivar', style: TextStyle(color: Color.fromRGBO(183, 28, 28, 1)))],
@@ -399,51 +404,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildFloatingActionButton(String? uid, DateTime? birthDate, List<MeasurementModel>? currentMeasurements, String? pregnancyId, bool? pregnancyIsActive, Map<String, String>? pregnancyFollowers) {
     if (birthDate != null && pregnancyId != null && currentMeasurements != null) {
-      return pregnancyIsActive == true && pregnancyFollowers?[uid] == 'owner' ? FloatingActionButton(
+      return pregnancyIsActive == true && _extractRole(pregnancyFollowers?[uid]) == 'owner' ? FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, 'MeasurementDialog', arguments: MeasurementDialogArguments(birthDate: birthDate, currentMeasurements: currentMeasurements, pregnancyId: pregnancyId));
         },
         child: const Icon(Icons.add),
       ) : SizedBox.shrink();
     } else {return SizedBox.shrink();}
-    // return FloatingActionButton(
-    //   onPressed: () {
-    //     Navigator.pushNamed(context, 'MeasurementDialog', arguments: MeasurementDialogArguments(pregnancy: pregnancies![selectedPregnancyIndex], birthDate: userModel!.birthDate));
-    //   },
+  }
 
-    //   // onPressed: pregnancies?[selectedPregnancyIndex].followers[userModel?.uid] == 'owner' ? () {
-    //   //   Navigator.pushNamed(
-    //   //     context,
-    //   //     'MeasurementDialog',
-    //   //     arguments: MeasurementDialogArguments(
-    //   //       pregnancy: pregnancies![selectedPregnancyIndex],
-    //   //       birthDate: userModel!.birthDate,
-    //   //     ),
-    //   //   );
-    //   // } : () {
-    //   //   showDialog(
-    //   //     context: context,
-    //   //     builder: (dialogContext) {
-    //   //       final dialogNavigator = Navigator.of(dialogContext);
-    //   //       return AlertDialog(
-    //   //         title: const Text('¿Registrar Embarazo?'),
-    //   //         content: const Text(
-    //   //             'Debes tener un embarazo propio para guardar tus mediciones'),
-    //   //         actions: [
-    //   //           TextButton(
-    //   //             child: const Text('No, Gracias'),
-    //   //             onPressed: () => dialogNavigator.pop(),
-    //   //           ),
-    //   //           FilledButton(
-    //   //             child: const Text('Registrar Embarazo'),
-    //   //             onPressed: () async => dialogNavigator.pop(),
-    //   //           ),
-    //   //         ],
-    //   //       );
-    //   //     },
-    //   //   );
-    //   // },
-    //   child: const Icon(Icons.edit),
-    // ) : SizedBox.shrink();
+  String _extractRole(String? followerData) {
+    if (followerData == null || followerData.isEmpty) return 'none';    
+    final parts = followerData.split('||');
+    return parts.first; 
   }
 }

@@ -346,18 +346,21 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
       if (context.mounted) {
         await showDialog(
           context: tempcontext,
-          builder: (_) => AlertDialog(
-            title: const Text('¡Atención!'),
-            content: const Text(
-              'Tus ultimas mediciones consecutivas han tenido riesgo alto.\n\nTe recomendamos que contactes a tu médico lo antes posible.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Entendido'),
-              ),
-            ],
-          ),
+          builder: (BuildContext dialogContext) {
+            final dialognavigator = Navigator.of(dialogContext);
+            return AlertDialog(
+              title: const Text('¡Atención!'),
+              content: const Text('Tus ultimas mediciones consecutivas han tenido riesgo alto.\n\nTe recomendamos que contactes a tu médico lo antes posible.'),
+              actions: [
+                TextButton(
+                  child: const Text('Entendido'),
+                  onPressed: () {
+                    dialognavigator.pop();
+                  },
+                ),
+              ],
+            );
+          }
         );
       }
     }
@@ -391,7 +394,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
     const notificationDetails = NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
-      0, 'Mamicheck', '¡Hola! Tus ultimos riesgos han sido altos. Consulta con tu Medico.', notificationDetails,
+      0, 'Mamicheck', '¡Alerta! Tus ultimos mediciones han tenido un riesgo alto. Consulta con tu Medico lo mas pronto posible.', notificationDetails,
     );
   }
 }

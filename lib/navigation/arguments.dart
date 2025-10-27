@@ -13,8 +13,10 @@ class MeasurementDialogArguments{
 class PregnancyDialogArguments{
   final String uid;
   final String firstName;
+  final String lastName;
+  final String email;
   final DateTime birthDate;
-  PregnancyDialogArguments({required this.uid, required this.firstName, required this.birthDate});
+  PregnancyDialogArguments({required this.uid, required this.firstName, required this.birthDate, required this.lastName, required this.email,});
 }
 class MeasurementsScreenArguments{
   final String pregnancyId;

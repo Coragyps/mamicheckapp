@@ -40,9 +40,9 @@ class PregnancyService {
   }
 
 /// estos
-  Future<void> addFollower(String pregnancyId, String uid) async {
+  Future<void> addFollower(String pregnancyId, String uid, String combinedData) async {
     final docRef = FirebaseFirestore.instance.collection('pregnancies').doc(pregnancyId);
-    await docRef.update({'followers.$uid': 'companion'});
+    await docRef.update({'followers.$uid': combinedData});
   }
 
   Future<void> removeFollower(String pregnancyId, String uid) async {
@@ -54,7 +54,8 @@ class PregnancyService {
     if (uid == null || uid.isEmpty) {return const Stream.empty();}
     return _db
       .collection('pregnancies')
-      .where('followers.$uid', whereIn: ["owner", "companion"])
+      //.where('followers.$uid', whereIn: ["owner", "companion"])
+      .where('followers.$uid', isGreaterThan: '')
       .snapshots()
       .map((QuerySnapshot snapshot) {
         return snapshot.docs

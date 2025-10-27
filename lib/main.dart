@@ -86,12 +86,19 @@ class AuthenticatedApp extends StatelessWidget {
         StreamProvider<UserModel?>(create: (_) => UserService().watchUser(user.uid), initialData: null, lazy: false),
         StreamProvider<List<PregnancyModel>>(
           create: (_) => PregnancyService().watchFollowedPregnancies(user.uid).map((pregnancies) {
+
+            String getRoleFromFollowerData(String? followerData) {
+              if (followerData == null || followerData.isEmpty) return 'none';
+              final parts = followerData.split('||');
+              return parts.first; 
+            }
+
             pregnancies.sort((a, b) {
               final activeCompare = b.isActive.toString().compareTo(a.isActive.toString());
               if (activeCompare != 0) return activeCompare;
 
-              final roleA = a.followers[user.uid];
-              final roleB = b.followers[user.uid];
+              final roleA = getRoleFromFollowerData(a.followers[user.uid]);
+              final roleB = getRoleFromFollowerData(b.followers[user.uid]);
               if (roleA == roleB) return 0;
               if (roleA == 'owner') return -1;
               return 1;

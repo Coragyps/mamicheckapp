@@ -49,7 +49,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 16),
-          child: FilledButton(
+          child: TextButton(
             onPressed: () => _handleSignup(context),
             child: const Text('Enviar'),
           ),
@@ -83,7 +83,16 @@ class _RegisterDialogState extends State<RegisterDialog> {
                             border: OutlineInputBorder(),
                             labelText: 'Nombres',
                           ),
-                          validator: (value) => value == null || value.isEmpty ? 'Ingresa tu Nombre' : null,
+                          validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ingresa tu Nombre';
+                              }
+                              // ⚠️ Validación del separador '||'
+                              if (value.contains('||')) {
+                                return 'El símbolo "||" no está permitido aquí.';
+                              }
+                              return null;
+                            },
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -92,7 +101,16 @@ class _RegisterDialogState extends State<RegisterDialog> {
                             border: OutlineInputBorder(),
                             labelText: 'Apellidos',
                           ),
-                          validator: (value) => value == null || value.isEmpty ? 'Ingresa tus Apellidos' : null,
+                          validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ingresa tus Apellidos';
+                              }
+                              // ⚠️ Validación del separador '||'
+                              if (value.contains('||')) {
+                                return 'El símbolo "||" no está permitido aquí.';
+                              }
+                              return null;
+                            },
                         ),
                       ],
                     ),
@@ -161,10 +179,32 @@ class _RegisterDialogState extends State<RegisterDialog> {
                           controller: _emailController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            labelText: 'Correo Electronico',
+                            labelText: 'Correo Electrónico',
                           ),
                           keyboardType: TextInputType.emailAddress,
-                          validator: (value) => value == null || value.isEmpty ? 'Ingresa un Correo Electronico' : null,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Ingresa tu correo electrónico.';
+                            }
+                            
+                            // ⚠️ Validación del separador '||' (aunque innecesaria, la incluimos por seguridad)
+                            if (value.contains('||')) {
+                              return 'Formato inválido. El símbolo "||" no está permitido.';
+                            }
+
+                            // 🎯 Validación del formato de correo electrónico
+                            // Esta RegEx verifica el formato básico (texto@dominio.extensión)
+                            final emailRegex = RegExp(
+                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              caseSensitive: false, // Ignora mayúsculas/minúsculas
+                            );
+                            
+                            if (!emailRegex.hasMatch(value)) {
+                              return 'Ingresa un formato de correo electrónico válido.';
+                            }
+                            
+                            return null; // La entrada es válida
+                          },
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -336,7 +376,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
   Future <void> _handleSignup(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       final messenger = ScaffoldMessenger.of(context);
-      final navigator = Navigator.of(context, rootNavigator: true);
+      final navigator = Navigator.of(context);
 
       final error = await AuthService().signup(
         email: _emailController.text.trim(),

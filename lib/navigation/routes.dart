@@ -30,7 +30,7 @@ class AppRouting {
         final args = settings.arguments as PregnancyDialogArguments;
         return MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (_) => PregnancyDialog(firstName: args.firstName, birthDate: args.birthDate, uid: args.uid,),
+          builder: (_) => PregnancyDialog(firstName: args.firstName, birthDate: args.birthDate, uid: args.uid, lastName: args.lastName, email: args.email,),
         );
 
       case 'HomeScreen':

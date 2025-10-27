@@ -6,7 +6,9 @@ class PregnancyDialog extends StatefulWidget {
   final String uid;
   final DateTime birthDate;
   final String firstName;
-  const PregnancyDialog({super.key, required this.birthDate, required this.firstName, required this.uid});
+  final String lastName;
+  final String email;
+  const PregnancyDialog({super.key, required this.birthDate, required this.firstName, required this.uid, required this.lastName, required this.email,});
 
   @override
   State<PregnancyDialog> createState() => _PregnancyDialogState();
@@ -57,11 +59,11 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
 
   PreferredSizeWidget _titlebar(BuildContext context) {
     return AppBar(
-      title: Text('Embarazo'),
+      title: Text('Mi Embarazo'),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 16),
-          child: FilledButton(
+          child: TextButton(
             onPressed: _isSaving ? null : () => _handleCreatePregnancy(context),
             child: _isSaving
             ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
@@ -442,10 +444,17 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
   }
 
   Future<void> _handleCreatePregnancy(BuildContext context) async {
+    const separator = '||';
+    final String ownerData = 
+      'owner$separator' 
+      '${widget.email}$separator'
+      '${widget.firstName}$separator'
+      '${widget.lastName}';
+
     setState(() => _isSaving = true);
     if (_formKey.currentState!.validate()) {
       final messenger = ScaffoldMessenger.of(context);
-      final navigator = Navigator.of(context, rootNavigator: true);
+      final navigator = Navigator.of(context);
 
       try {
         final weight = double.parse(_weightController.text.trim());
@@ -478,8 +487,8 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
           },
           riskFactors: riskFactorsList,
           followers: {
-            widget.uid: 'owner',
-            'nNF18EWgOBb786CFQboARQN8gB53': 'companion',
+            widget.uid: ownerData,
+            'nNF18EWgOBb786CFQboARQN8gB53': 'companion||mamicheckroot@gmail.com||Mamicheck||Root',
           },
           measurements: [], // Vacío al inicio
         );
