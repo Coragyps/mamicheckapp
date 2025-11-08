@@ -85,17 +85,15 @@ class _InviteSheetState extends State<InviteSheet> {
                 );
 
                 if (!mounted) return;
-                messenger.showSnackBar(
-                  SnackBar(content: Text('Se invitó a: $email a monitorear el embarazo ${widget.pregnancyName}')),
-                );
+                messenger.clearSnackBars();
+                messenger.showSnackBar(SnackBar(content: Text('Se invitó a: $email a monitorear el embarazo ${widget.pregnancyName}')),);
                 navigator.pop();
               } else {
                 setState(() => _emailErrorText = 'No se encontró ese correo');
               }
             } catch (e) {
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Ocurrió un error al invitar')),
-              );
+              messenger.clearSnackBars();
+              messenger.showSnackBar(const SnackBar(content: Text('Ocurrió un error al invitar')),);
             } finally {
               if (mounted) setState(() => isLoading = false);
             }

@@ -66,8 +66,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       final selectedDays = daysOfWeek.asMap().entries.where((entry) => entry.value).toList();
-      if (notificationTime == null) {contextNotifications.showSnackBar(const SnackBar(content: Text('⚠️ Selecciona una hora primero'))); return;}      
-      if (selectedDays.isEmpty) {contextNotifications.showSnackBar(const SnackBar(content: Text('⚠️ Selecciona al menos un día de la semana'))); return;}
+      if (notificationTime == null) {contextNotifications.clearSnackBars(); contextNotifications.showSnackBar(const SnackBar(content: Text('⚠️ Selecciona una hora primero'))); return;}      
+      if (selectedDays.isEmpty) {contextNotifications.clearSnackBars(); contextNotifications.showSnackBar(const SnackBar(content: Text('⚠️ Selecciona al menos un día de la semana'))); return;}
       await flutterLocalNotificationsPlugin.cancelAll();
       await _saveNotificationSettings();
 
@@ -99,11 +99,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       final daysList = selectedDays.map((entry) => dayNames[entry.key]).join(', ');
+      contextNotifications.clearSnackBars();
       contextNotifications.showSnackBar(
         SnackBar(content: Text('✅ Recordatorios programados: $daysList a las ${notificationTime!}'),),
       );
       
     } catch (e) {
+      contextNotifications.clearSnackBars();
       contextNotifications.showSnackBar(SnackBar(content: Text('Error al programar recordatorios: $e')),);
     }
   }
@@ -145,6 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       else if (notificationStatus.isGranted) {message = '⚠️ Solo notificaciones concedidas. Faltan alarmas exactas';} 
       else if (scheduleStatus.isGranted) {message = '⚠️ Solo alarmas exactas concedidas. Faltan notificaciones';} 
       else {message = '❌ Faltan ambos permisos';}
+      contextPermissions.clearSnackBars();
       contextPermissions.showSnackBar(SnackBar(content: Text(message)));
 
       // Si faltan permisos, ofrecer solicitarlos
@@ -193,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Perfil y Ajustes'),
+        title: const Text('Ajustes'),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -253,9 +256,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   final emailMessenger = ScaffoldMessenger.of(context);
                                   try {
                                     await FirebaseAuth.instance.sendPasswordResetEmail(email: userModel.email);
+                                    emailMessenger.clearSnackBars();
                                     emailMessenger.showSnackBar(const SnackBar(content: Text('Se envio un correo de cambio de contraseña')));
                                     dialognavigator.pop();         
                                   } catch (e) {
+                                    emailMessenger.clearSnackBars();
                                     emailMessenger.showSnackBar(const SnackBar(content: Text('Error al enviar el correo. Intenta de nuevo.')));          
                                   }
                                 },

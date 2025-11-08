@@ -231,6 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         selectedPregnancyIndex = i;
                       });
+                      messenger.clearSnackBars();
                       messenger.showSnackBar(SnackBar(content: Text('Mostrando ${pregnancyNames[i]}')));
                     },
                     child: Text(pregnancyNames[i]),
@@ -254,6 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   selectedPeriod = newPeriod;
                 });
+                messenger.clearSnackBars();
                 messenger.showSnackBar(SnackBar(content: Text('Mostrando resultados de $selectedPeriod')));
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -329,6 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           initialChildSize: 0.7,
                           builder: (context, scrollController) {
                             return FollowersSheet(
+                              pregnancyName: pregnancyNames[selectedPregnancyIndex],
                               scrollController: scrollController,
                               pregnancyId: pregnancyId!,
                               followers: pregnancyFollowers!
@@ -363,7 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: const Text('Acepto'),
                               onPressed: () async {
                                 await PregnancyService().deactivatePregnancy(pregnancyId!);
-                                messenger.showSnackBar(SnackBar(content: Text('${pregnancyNames[selectedPregnancyIndex]} se marco como archivado')));
+                                messenger.clearSnackBars();
+                                messenger.showSnackBar(SnackBar(content: Text('${pregnancyNames[selectedPregnancyIndex]} se marcó como archivado')));
                                 dialognavigator.pop();                      
                               },
                             )
@@ -372,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     );
                     break;                
-                  default: messenger.showSnackBar(SnackBar(content: Text('¡Acción "$value" no existe!')));
+                  default: messenger.clearSnackBars(); messenger.showSnackBar(SnackBar(content: Text('¡Acción "$value" no existe!')));
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

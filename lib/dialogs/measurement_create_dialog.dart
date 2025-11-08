@@ -302,20 +302,23 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
           final riskText = switch (riskLevel) {0 => 'Riesgo Bajo', 1 => 'Riesgo Medio', 2 => 'Riesgo Alto', _ => 'Riesgo Desconocido'};
           final riskColor = switch (riskLevel) {0 => Colors.green, 1 => Colors.orange, 2 => Colors.red, _ => Colors.blue};
 
+          messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              content: Text(riskText),
+              content: Text('Medición guardada con $riskText'),
               backgroundColor: riskColor,
             ),
           );
 
         } else {
+          messenger.clearSnackBars();
           messenger.showSnackBar(SnackBar(
             content: Text('Error ${response.statusCode}: ${response.body}'),
             backgroundColor: Colors.blue,
           ));
         }
       } else {
+        messenger.clearSnackBars();
         messenger.showSnackBar(SnackBar(
           content: Text('Medición guardada sin cálculo de riesgo.'),
           backgroundColor: Colors.blue,
@@ -367,6 +370,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
       navigator.pop();
 
     } catch (e) {
+      messenger.clearSnackBars();
       messenger.showSnackBar(SnackBar(content: Text('Error al guardar la medición: $e')));
     }
     

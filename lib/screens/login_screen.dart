@@ -357,6 +357,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         if (!mounted) return;
         if (error != null) {
+          messenger.clearSnackBars();
           messenger.showSnackBar(SnackBar(content: Text(error), action: SnackBarAction(label: 'OK', onPressed: () {},)));
         }
       } finally {

@@ -159,22 +159,16 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
               _ => Colors.blue
             };
 
-            messenger.showSnackBar(SnackBar(
-              content: Text(riskText),
-              backgroundColor: riskColor,
-            ));
+            messenger.clearSnackBars();
+            messenger.showSnackBar(SnackBar(content: Text('Medición guardada con $riskText'),backgroundColor: riskColor,));
 
           } else {
-            messenger.showSnackBar(SnackBar(
-              content: Text('Error ${response.statusCode}: ${response.body}'),
-              backgroundColor: Colors.blue,
-            ));
+            messenger.clearSnackBars();
+            messenger.showSnackBar(SnackBar(content: Text('Error ${response.statusCode}: ${response.body}'),backgroundColor: Colors.blue,));
           }
         } catch (e) {
-          messenger.showSnackBar(SnackBar(
-            content: Text('Error de red: $e'),
-            backgroundColor: Colors.blue,
-          ));
+          messenger.clearSnackBars();
+          messenger.showSnackBar(SnackBar(content: Text('Error de red: $e'),backgroundColor: Colors.blue,));
         }
       }
 

@@ -66,23 +66,13 @@ class _UserPasswordEditSheetState extends State<UserPasswordEditSheet> {
                           .sendPasswordResetEmail(email: email);
 
                       if (!mounted) return;
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.',
-                          ),
-                        ),
-                      );
+                      messenger.clearSnackBars();
+                      messenger.showSnackBar(const SnackBar(content: Text('Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.',),),);
                       navigator.pop();
                     } catch (_) {
                       // Evitar user enumeration
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.',
-                          ),
-                        ),
-                      );
+                      messenger.clearSnackBars();
+                      messenger.showSnackBar(const SnackBar(content: Text('Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.',),),);
                       navigator.pop();
                     } finally {
                       if (mounted) setState(() => isLoading = false);

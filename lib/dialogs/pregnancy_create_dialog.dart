@@ -497,6 +497,7 @@ class _PregnancyDialogState extends State<PregnancyDialog> {
         navigator.pop(); // cerrar diálogo o regresar después de guardar
 
       } catch (e) {
+        messenger.clearSnackBars();
         messenger.showSnackBar(SnackBar(content: Text("Error al guardar el embarazo: $e")),);
         //navigator.pop();
       }

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mamicheckapp/services/pregnancy_service.dart';
+import 'package:mamicheckapp/services/user_service.dart';
 
 class FollowersSheet extends StatelessWidget {
   final ScrollController scrollController;
   final Map<String, String> followers;
   final String pregnancyId;
+  final String pregnancyName;
 
   const FollowersSheet({
     super.key,
     required this.scrollController,
-    required this.followers, required this.pregnancyId,
+    required this.followers, required this.pregnancyId, required this.pregnancyName,
   });
 
   @override
@@ -43,49 +45,6 @@ class FollowersSheet extends StatelessWidget {
             final lastName = dataParts.length > 3 ? dataParts[3] : 'Desconocido';
             final baseColor = _profileColor(uid);
 
-            // return Card(
-            //   elevation: 0,
-            //   margin: const EdgeInsets.symmetric(vertical: 4),
-            //   color: Theme.of(context).colorScheme.surfaceContainerHigh,
-            //   child: ListTile(
-            //     leading: CircleAvatar(
-            //       backgroundColor: baseColor.shade900,
-            //       child: Text(uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? 'MR' : uid[0]+uid[1],style: TextStyle(color: baseColor.shade100))
-            //     ),                
-            //     title: Text(uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? 'Mamicheck' : '($role)', style: Theme.of(context).textTheme.labelLarge),
-            //     subtitle: Text(uid, style: Theme.of(context).textTheme.bodySmall),
-            //     trailing: role == 'owner' || uid == 'nNF18EWgOBb786CFQboARQN8gB53' ? null : IconButton.filled(
-            //       icon: Icon(Icons.delete_forever, color: Theme.of(context).colorScheme.onPrimary),
-            //       onPressed: () {
-            //         showDialog(
-            //           context: context,
-            //           builder: (BuildContext dialogContext) {
-            //             return AlertDialog(
-            //               title: const Text('Eliminar Seguidor'),
-            //               content: const Text('¿Estás seguro de que quieres eliminar a este seguidor? Esta acción no se puede deshacer.'),
-            //               actions: [
-            //                 FilledButton(
-            //                   child: const Text('No, Gracias'),
-            //                   onPressed: () {Navigator.of(dialogContext).pop();}
-            //                 ),
-            //                 TextButton(
-            //                   child: const Text('Acepto'),
-            //                   onPressed: () async {
-            //                     Navigator.of(dialogContext).pop();
-            //                     await pregnancyService.removeFollower(pregnancyId, uid);
-            //                     messenger.showSnackBar(const SnackBar(content: Text('Seguidor eliminado correctamente.')),);  
-            //                     navigator.pop(); 
-            //                   },
-            //                 )
-            //               ],
-            //             );
-            //           },
-            //         );
-            //       },
-            //     ),
-            //   ),
-            // );
-
             return Card(
               elevation: 0,
               margin: const EdgeInsets.symmetric(vertical: 4),
@@ -116,6 +75,8 @@ class FollowersSheet extends StatelessWidget {
                               onPressed: () async {
                                 Navigator.of(dialogContext).pop();
                                 await pregnancyService.removeFollower(pregnancyId, uid);
+                                await UserService().sendPregnancyInviteNotification(uid: uid, pregnancyId: 'eliminacion||', pregnancyName: pregnancyName);
+                                messenger.clearSnackBars();
                                 messenger.showSnackBar(const SnackBar(content: Text('Seguidor eliminado correctamente.')),);  
                                 navigator.pop(); 
                               },

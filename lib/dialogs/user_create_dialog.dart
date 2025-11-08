@@ -406,6 +406,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
         if (navigator.canPop()) {navigator.pop();}
 
       } else {
+        messenger.clearSnackBars();
         messenger.showSnackBar(
           SnackBar(content: Text(error))
         );
