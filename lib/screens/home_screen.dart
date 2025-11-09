@@ -26,7 +26,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<PregnancyModel> pregnancies = context.watch<List<PregnancyModel>>();
     final UserModel? userModel = context.watch<UserModel?>();
-    final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty ? pregnancies[selectedPregnancyIndex] : null;
+
+    // 🔹 Ajusta índice si se sale del rango
+    if (selectedPregnancyIndex >= pregnancies.length && pregnancies.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() => selectedPregnancyIndex = pregnancies.length - 1);
+      });
+    } else if (pregnancies.isEmpty && selectedPregnancyIndex != 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() => selectedPregnancyIndex = 0);
+      });
+    }
+
+    final PregnancyModel? selectedPregnancy = pregnancies.isNotEmpty && selectedPregnancyIndex < pregnancies.length ? pregnancies[selectedPregnancyIndex] : null;
     final now = DateTime.now();
     final bool isLoading = pregnancies.length == 1 && pregnancies.first.id == 'dummy';
     final bool hasActiveOwnedPregnancy = userModel != null && pregnancies.isNotEmpty && pregnancies.first.isActive && _extractRole(pregnancies.first.followers[userModel.uid]) == 'owner';
