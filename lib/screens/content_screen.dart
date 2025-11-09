@@ -83,6 +83,17 @@ class _ContentScreenState extends State<ContentScreen> {
     );
   }
 
+  void _scrollToRiskFactors() {
+    final ctx = riskFactorsKey.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
 
 Widget _buildKpiCarrousel() {
   final theme = Theme.of(context);
@@ -125,11 +136,11 @@ Widget _buildKpiCarrousel() {
   }
 
   final explanations = [
-    [Text(items[0].$1), Text('Indica el progreso actual del embarazo en semanas, calculado a partir de la Fecha de Última Regla (FUR).''\n\n📅 Fecha FUR: $formattedFur''\n\n🤱 Fecha probable de parto: $probableDueDate')],
+    [Text(items[0].$1), Text('Indica el progreso actual del embarazo en semanas, calculado a partir de la Fecha de Última Regla (FUR).''\n\nFecha FUR:\n$formattedFur''\n\nFecha probable de parto:\n$probableDueDate')],
     [Text(items[1].$1), Text('Número total de registros que has ingresado en la app dentro del período de tiempo seleccionado.')],
     [Text(items[2].$1), Text('Indica el riesgo estimado según tus signos vitales dentro del período de tiempo seleccionado.\n\nConsulta con tu médico si mantienes un riesgo alto tras varias mediciones.')],
     [Text(items[3].$1), Text('Cantidad de días consecutivos en los que realizaste mediciones. Refleja tu constancia en el control de salud.')],
-    [Text(items[4].$1), Text('Factores detectados por los datos del cuestionario de embarazo.\n\nSon importantes ante otros transtornos hipertensivos como Preeclampsia.')],
+    // [Text(items[4].$1), Text('Factores detectados por los datos del cuestionario de embarazo.\n\nSon importantes ante otros transtornos hipertensivos como Preeclampsia.')],
   ];
 
   return SizedBox(
@@ -150,7 +161,7 @@ Widget _buildKpiCarrousel() {
           decoration: BoxDecoration(
             color: isRisk
                 ? getRiskColor(lastRisk)
-                : theme.colorScheme.secondaryContainer,
+                : theme.colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -172,7 +183,7 @@ Widget _buildKpiCarrousel() {
                   IconButton(
                     visualDensity: VisualDensity.compact,
                     onPressed: () {
-                      showDialog(
+                      i == 4 ? _scrollToRiskFactors() : showDialog(
                         context: context,
                         builder: (BuildContext dialogContext) {
                           final dialognavigator = Navigator.of(dialogContext);
@@ -197,7 +208,7 @@ Widget _buildKpiCarrousel() {
               Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(14),
@@ -735,38 +746,112 @@ Widget _buildKpiCarrousel() {
     );
   }
 
-  Widget _buildRiskFactorList(List<String> riskFactors) {
-    if (riskFactors.isEmpty) return SizedBox.shrink();
+  final GlobalKey riskFactorsKey = GlobalKey();
 
-    return Card(
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      margin: EdgeInsets.symmetric(horizontal: 12),
-      elevation: 0,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [ 
-            Text('Factores de Riesgo',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
-            Text('Ante otras enfermedades hipertensivas del embarazo'),
-            SizedBox(height: 12),
+  Widget _buildRiskFactorList(List<String> riskFactors) {
+  final hasFactors = riskFactors.isNotEmpty;
+
+  return Card(
+    key: riskFactorsKey,
+    color: Theme.of(context).colorScheme.secondaryContainer,
+    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    elevation: 0,
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Factores de Riesgo',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryFixed,
+                ),
+          ),
+          const SizedBox(height: 4),
+
+          Text(
+            hasFactors
+                ? 'Estos factores aumentan el riesgo de transtornos como la preeclampsia. Es fundamental un seguimiento médico'  
+                : 'No se identificaron factores de riesgo, continúe con su control prenatal habitual',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
+
+          if (hasFactors)
             Wrap(
               spacing: 8,
-              runSpacing: 0,
+              runSpacing: 4,
               children: riskFactors.map((factor) {
-                return Chip(
-                  label: Text(factor),
-                  avatar: Icon(Icons.warning, color: Colors.red),
+                return ActionChip(
+                  avatar: const Icon(Icons.warning, color: Colors.redAccent),
+                  side: BorderSide(color: Colors.transparent),
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                  label: Text(factor, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.primary,)),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(factor),
+                        content: Text(getFactorExplanation(factor)),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('Cerrar'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               }).toList(),
             ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
+  String getFactorExplanation(String factor) {
+    switch (factor) {
+      case 'Edad Materna >= 40 años':
+        return 'La edad materna avanzada puede afectar la función vascular y placentaria. Esto eleva el riesgo de EHE y otras complicaciones. Requiere un seguimiento prenatal más minucioso.';
+
+      case 'IMC >= 30 kg/m2':
+        return 'El sobrepeso u obesidad se asocian con inflamación crónica y disfunción endotelial, factores que aumentan el riesgo de desarrollar Preeclampsia.';
+
+      case 'Intervalo Intergenésico >= 10 años':
+        return 'Un período muy largo entre embarazos puede afectar la adaptación del sistema cardiovascular y la implantación placentaria, aumentando ligeramente la posibilidad de EHE.';
+
+      case 'Embarazo Múltiple':
+        return 'La carga placentaria es mayor en embarazos de mellizos o más. Esto genera más demanda y estrés en el sistema materno, incrementando el riesgo de Preeclampsia.';
+
+      case 'Diabetes Tipo 2': // Asegúrate de usar el string exacto que proviene de '_diabetesHistory'
+      case 'Diabetes Tipo 1': // Asegúrate de usar el string exacto que proviene de '_diabetesHistory'
+        return 'La Diabetes (existente o gestacional) causa daño vascular y sistémico. Esto impacta directamente la salud de los vasos sanguíneos y eleva el riesgo de EHE.';
+
+      case 'Síndrome Antifosfolípido':
+        return 'Es una enfermedad autoinmune que causa coagulación anormal. Afecta el flujo sanguíneo a la placenta, siendo un factor de riesgo significativo para Preeclampsia y otras fallas placentarias.';
+
+      case 'Lupus Eritematoso Sistémico':
+        return 'El LES es una enfermedad autoinmune que puede dañar órganos y vasos sanguíneos. Su actividad durante el embarazo está fuertemente asociada a un mayor riesgo de EHE.';
+
+      case 'Enfermedad Hipertensiva en Embarazo Anterior':
+        return 'Si hubo Preeclampsia o Hipertensión Gestacional antes, el riesgo de que se repita en este embarazo es considerablemente mayor. El monitoreo debe ser continuo.';
+
+      case 'Antecedente Familiar de Preeclampsia':
+        return 'Existe un componente genético. Si familiares cercanos (madre, hermana) tuvieron Preeclampsia, esto indica una predisposición, elevando el riesgo propio.';
+
+      case 'Hipertensión Crónica':
+        return 'La presión arterial alta preexistente ejerce un estrés constante en los vasos sanguíneos. Esto aumenta significativamente el riesgo de Preeclampsia (sobreagregada) desde el inicio.';
+
+      case 'Enfermedad Renal Crónica':
+        return 'La función renal comprometida dificulta la regulación de la presión arterial y el manejo de líquidos, lo que incrementa el riesgo de desarrollar Preeclampsia.';
+
+      default:
+        return 'Información detallada no disponible para este factor de riesgo.';
+    }
+  }
 
   Widget _buildRiskChip(String label, Color color) {
     return Row(

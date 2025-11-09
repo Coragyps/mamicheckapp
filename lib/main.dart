@@ -51,6 +51,9 @@ class MyApp extends StatelessWidget {
         snackBarTheme: SnackBarThemeData(
           backgroundColor: colorss.onPrimaryFixed,
         ),
+        inputDecorationTheme: const InputDecorationTheme(
+          errorMaxLines: 2, // ⬅️ Permite hasta 2 líneas para los errores
+        ),
       ),
 
       home: AuthWrapper(),

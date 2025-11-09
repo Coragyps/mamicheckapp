@@ -153,10 +153,10 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
               _ => 'Riesgo Desconocido'
             };
             final riskColor = switch (riskLevel) {
-              0 => Colors.green,
-              1 => Colors.orange,
-              2 => Colors.red,
-              _ => Colors.blue
+              0 => Colors.green.shade800,
+              1 => Colors.orange.shade800,
+              2 => Colors.red.shade800,
+              _ => Colors.blue.shade800,
             };
 
             messenger.clearSnackBars();
@@ -164,11 +164,11 @@ class _MeasurementSheetState extends State<MeasurementSheet> {
 
           } else {
             messenger.clearSnackBars();
-            messenger.showSnackBar(SnackBar(content: Text('Error ${response.statusCode}: ${response.body}'),backgroundColor: Colors.blue,));
+            messenger.showSnackBar(SnackBar(content: Text('Error ${response.statusCode}: ${response.body}')));
           }
         } catch (e) {
           messenger.clearSnackBars();
-          messenger.showSnackBar(SnackBar(content: Text('Error de red: $e'),backgroundColor: Colors.blue,));
+          messenger.showSnackBar(SnackBar(content: Text('Error de red: $e')));
         }
       }
 

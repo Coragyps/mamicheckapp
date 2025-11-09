@@ -19,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   TimeOfDay? notificationTime;
   List<bool> daysOfWeek = List.filled(7, false);
+  bool permitirNotificaciones = false;
   final dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   
   @override
@@ -45,7 +46,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       for (int i = 0; i < 7; i++) {
         daysOfWeek[i] = prefs.getBool('day_$i') ?? false;
       }
+
+      permitirNotificaciones = prefs.getBool('permitirNotificaciones') ?? false;
     });
+  }
+
+  Future<void> _clearNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      notificationTime = null;
+      daysOfWeek = List.filled(7, false);
+    });
+
+    // Borra los campos relacionados
+    await prefs.remove('notification_hour');
+    await prefs.remove('notification_minute');
+    for (int i = 0; i < 7; i++) {
+      await prefs.remove('day_$i');
+    }
+
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 
   Future<void> _saveNotificationSettings() async {
@@ -99,9 +120,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       final daysList = selectedDays.map((entry) => dayNames[entry.key]).join(', ');
+      final hour = notificationTime!.hour.toString().padLeft(2, '0');
+      final minute = notificationTime!.minute.toString().padLeft(2, '0');
+      final formattedTime = '$hour:$minute';
       contextNotifications.clearSnackBars();
       contextNotifications.showSnackBar(
-        SnackBar(content: Text('✅ Recordatorios programados: $daysList a las ${notificationTime!}'),),
+        SnackBar(content: Text('✅ Recordatorios programados: $daysList a las $formattedTime'),),
       );
       
     } catch (e) {
@@ -143,10 +167,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final scheduleStatus = await Permission.scheduleExactAlarm.status;
       
       String message = '';
-      if (notificationStatus.isGranted && scheduleStatus.isGranted) {message = '✅ Todos los permisos están concedidos';} 
+      if (notificationStatus.isGranted && scheduleStatus.isGranted) {message = 'Todos los permisos están concedidos';} 
       else if (notificationStatus.isGranted) {message = '⚠️ Solo notificaciones concedidas. Faltan alarmas exactas';} 
       else if (scheduleStatus.isGranted) {message = '⚠️ Solo alarmas exactas concedidas. Faltan notificaciones';} 
-      else {message = '❌ Faltan ambos permisos';}
+      else {message = 'Faltan ambos permisos';}
       contextPermissions.clearSnackBars();
       contextPermissions.showSnackBar(SnackBar(content: Text(message)));
 
@@ -179,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       helpText: 'Selecciona la hora de tu recordatorio',
       cancelText: 'Cancelar',
       confirmText: 'OK',
-      initialEntryMode: TimePickerEntryMode.dialOnly,
+      initialEntryMode: TimePickerEntryMode.dial,
     );
     if (picked != null) {setState(() => notificationTime = picked);}
   }
@@ -187,6 +211,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userModel = context.watch<UserModel?>();
+    final theme = Theme.of(context);
+
 
     if (userModel == null) {
       return const Scaffold(
@@ -214,8 +240,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Text(userModel.firstName[0]+userModel.lastName[0], style: TextStyle(color: Colors.primaries[userModel.uid.hashCode.abs() % Colors.primaries.length].shade100)),
                     ),
                     const SizedBox(height: 12),
-                    Text('${userModel.firstName} ${userModel.lastName}', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryContainer),),
-                    Text(userModel.email, style: Theme.of(context).textTheme.bodyMedium),
+                    Text('${userModel.firstName} ${userModel.lastName}', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimaryContainer),),
+                    Text(userModel.email, style: theme.textTheme.bodyMedium),
                   ],
                 ),
               ),
@@ -226,19 +252,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(Icons.cake, color: Theme.of(context).colorScheme.primary),
-                    title: Text('Fecha de nacimiento', style: Theme.of(context).textTheme.labelMedium),
-                    subtitle: Text('${userModel.birthDate.day}/${userModel.birthDate.month}/${userModel.birthDate.year}', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    leading: Icon(Icons.cake, color: theme.colorScheme.primary),
+                    title: Text('Fecha de nacimiento'),
+                    subtitle: Text('${userModel.birthDate.day}/${userModel.birthDate.month}/${userModel.birthDate.year}'),
                   ),
                   ListTile(
-                    leading: Icon(Icons.phone, color: Theme.of(context).colorScheme.primary),
-                    title: Text('Teléfono', style: Theme.of(context).textTheme.labelMedium),
-                    subtitle: Text(userModel.telephoneNumber, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    leading: Icon(Icons.phone, color: theme.colorScheme.primary),
+                    title: Text('Teléfono'),
+                    subtitle: Text(userModel.telephoneNumber),
                   ),
                   ListTile(
-                    leading: Icon(Icons.lock, color: Theme.of(context).colorScheme.primary),
-                    title: Text('Contraseña', style: Theme.of(context).textTheme.labelMedium),
-                    subtitle: Text('Vigente', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    leading: Icon(Icons.lock, color: theme.colorScheme.primary),
+                    title: Text('Contraseña'),
+                    subtitle: Text('Vigente'),
                     trailing: TextButton(
                     onPressed: () {
                       showDialog(
@@ -273,6 +299,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: const Text('Cambiar'),
                     ),
                   ),
+                  ListTile(
+                    leading: Icon(permitirNotificaciones ? Icons.notifications_active : Icons.notifications_off, color: theme.colorScheme.primary),
+                    title: Text('Notificaciones'),
+                    subtitle: Text(permitirNotificaciones ? 'Habilitadas' : 'Desactivadas'),
+                    trailing: Switch(
+                      value: permitirNotificaciones, 
+                      onChanged: (bool value) async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        setState(() {permitirNotificaciones = value;});
+
+                        final prefs = await SharedPreferences.getInstance();
+                        if (!value) {await _clearNotificationSettings();}
+                        await prefs.setBool('permitirNotificaciones', value);
+
+                        messenger.clearSnackBars();
+                        messenger.showSnackBar(SnackBar(content: Text(value ? 'Se habilitaron las notificaciones.': 'Se desactivo las notificaciones. No recibirás recordatorios.')));
+                      }
+                    )
+                  ),                  
                 ],
               ),
             ),
@@ -283,7 +328,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 24),
-                  Text('Recordatorios',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                  Text('Recordatorios',style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimaryFixed)),
                 ],
               ),
             ),
@@ -292,24 +337,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(Icons.access_time_filled, color: Theme.of(context).colorScheme.primary),
-                    title: Text('Hora de alerta', style: Theme.of(context).textTheme.labelMedium),
-                    subtitle: Text(notificationTime?.format(context) ?? 'No establecida', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
+                    enabled: permitirNotificaciones ? true : false,
+                    leading: Icon(Icons.access_time_filled, color: permitirNotificaciones ? theme.colorScheme.primary : theme.colorScheme.primary.withAlpha(97)),
+                    title: Text('Hora de alerta'),
+                    subtitle: Text(notificationTime?.format(context) ?? 'No establecida'),
                     trailing: TextButton(
-                      onPressed:  _selectTime,
+                      onPressed:  permitirNotificaciones ? _selectTime : null,
                       child: const Text('Cambiar'),
                     ),
                   ),
                   ListTile(
-                    leading: Icon(Icons.calendar_month, color: Theme.of(context).colorScheme.primary),
-                    title: Text('Día(s) de la alerta', style: Theme.of(context).textTheme.labelMedium),
+                    enabled: permitirNotificaciones ? true : false,
+                    leading: Icon(Icons.calendar_month, color: permitirNotificaciones ? theme.colorScheme.primary : theme.colorScheme.primary.withAlpha(97)),
+                    title: Text('Día(s) de la alerta', ),
                     subtitle: Text(
                       daysOfWeek.asMap().entries.where((e) => e.value).map((e) => dayNames[e.key]).join(', ').isEmpty ? 'No establecido' :
                       daysOfWeek.asMap().entries.where((e) => e.value).map((e) => dayNames[e.key]).join(', '),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)
                     ),
                     trailing: TextButton(
-                      onPressed: () {
+                      onPressed: permitirNotificaciones ? () {
                         showDialog<List<bool>>(
                           context: context,
                           builder: (BuildContext dialogContext) {
@@ -330,9 +376,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         spacing: 8,
                                         children: List.generate(7, (i) {
                                           return FilterChip(
-                                            label: Text(dayNames[i], style: TextStyle(color: tempDays[i] ? Colors.white : null,),),
+                                            label: Text(dayNames[i], style: TextStyle(color: tempDays[i] ? Colors.white : Theme.of(context).colorScheme.primary),),
+                                            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
                                             selected: tempDays[i],
-                                            selectedColor: Colors.red,
+                                            elevation: 2,
+                                            side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                            selectedColor: Theme.of(context).colorScheme.primary,
                                             checkmarkColor: Colors.white,
                                             onSelected: (_) {setState(() => tempDays[i] = !tempDays[i]);},
                                           );
@@ -349,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                           },
                         ).then((result) {if (result != null) {setState(() => daysOfWeek = result);}}); // 👈 solo actualizamos al guardar
-                      },
+                      } : null,
                       child: const Text('Cambiar'),
                     ),
                   ),
@@ -362,11 +411,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Material(
                 elevation: 0,
                 borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.surfaceContainerHigh,             
+                color: permitirNotificaciones ? theme.colorScheme.surfaceContainerHigh : theme.colorScheme.surfaceContainer,             
                 child: Column(
                   spacing: 0,
                   children: [
-                    ListTile(title: Text('Configura la hora y dias de la semana para que te enviemos recordatorios según tu disponibilidad', style: Theme.of(context).textTheme.labelMedium)),
+                    ListTile(title: Text('Configura la hora y dias de la semana para que te enviemos recordatorios según tu disponibilidad', style: permitirNotificaciones ? theme.textTheme.labelMedium : theme.textTheme.labelMedium?.copyWith(color: theme.disabledColor))),
                   ],
                 ),
               ),
@@ -375,24 +424,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(children: [
-                FilledButton.icon(onPressed: () {
-                  _saveAndScheduleNotification();
-                }, icon: const Icon(Icons.save), label: Text('Guardar cambios')),
+                FilledButton.icon(
+                  onPressed: permitirNotificaciones ? () {
+                    _saveAndScheduleNotification();
+                  } : null,
+                  icon: const Icon(Icons.save), 
+                  label: Text('Guardar cambios'),
+                ),
                 const SizedBox(width: 8),
                 TextButton(
-                  onPressed: () {
+                  onPressed: permitirNotificaciones ? () {
                     showDialog(
                       context: context,
                       builder: (BuildContext dialogContext) {
                         final dialognavigator = Navigator.of(dialogContext);
                         return AlertDialog(
                           title: const Text('¿Cuándo programar mis recordatorios?'),
-                          content: const Text('Es importante que tomes tus mediciones a una hora fija. Piensa en tu rutina y elige un momento en el que no tengas prisa. Te sugerimos la siguiente frecuencia:\n\n1er trimestre: Al menos una vez a la semana.\n2do trimestre: Al menos dos veces a la semana.\n3er trimestre: Al menos tres veces a la semana.'),
+                          content: const Text('Es importante que tomes tus mediciones a una hora fija. Piensa en tu rutina y elige un momento en el que no tengas prisa.\n\n1er trimestre:\nAl menos una vez por semana.\n\n2do trimestre:\nAl menos dos veces en la semana.\n\n3er trimestre:\nAl menos tres veces a la semana.'),
                           actions: [TextButton(child: const Text('OK'), onPressed: () {dialognavigator.pop();})], 
                         );
                       }
                     );
-                  }, 
+                  } : null, 
                   child: Text('Ayuda')
                 ),
               ],),
@@ -405,12 +458,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 24),
-                  Text('Activar Notificaciones',style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryFixed)),
+                  Text('Permisos de Aplicación',style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimaryFixed)),
                   const SizedBox(height: 8),
-                  Text('Configura el acceso a notificaciones en tu Celular. Tambien puedes ver una previsualización'),
+                  Text('Queremos enviarte notificaciones de alertas y recordatorios durante tu embarazo.'),
                   const SizedBox(height: 8),
                   Row(children: [
-                    OutlinedButton(onPressed: _checkPermissionStatus, child: Text('Solicitar Permisos')),
+                    OutlinedButton(onPressed: _checkPermissionStatus, child: Text('Otorgar Permisos')),
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {

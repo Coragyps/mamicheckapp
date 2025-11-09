@@ -79,18 +79,6 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
           key: _formKey,
           child: Column(
             children: [
-              // // Fecha picker simplificado
-              // ListTile(
-              //   title: Text('Embarazo: ${widget.pregnancyId}'),
-              // ),
-              // ListTile(
-              //   title: Text('Fecha: ${_measurementDate.toLocal().toString().split(' ')[0]}'),
-              //   trailing: const Icon(Icons.calendar_today),
-              // ),
-              // // ListTile(
-              // //   title: Text('Fecha: ${widget.birthDate.toLocal().toString().split(' ')[0]}'),
-              // //   trailing: const Icon(Icons.calendar_today),
-              // // ),
               Image(image: AssetImage('assets/img/bloodpressure.png'), fit: BoxFit.contain),
               const SizedBox(height: 16),
               Row(
@@ -107,13 +95,13 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                         TextFormField(
                           controller: _systolicController,
                           enabled: !_isSaving,
-                          decoration: const InputDecoration(labelText: 'Presión Sistólica', border: OutlineInputBorder(),suffixText: 'mmHg'),
+                          decoration: const InputDecoration(labelText: 'Presión Sistólica *', border: OutlineInputBorder(),suffixText: 'mmHg', helperText: "Valor superior de la presión arterial"),
                           keyboardType: TextInputType.number,
                           validator: (value) {
-                            if (value!.trim().isEmpty) return 'Este campo es obligatorio';
+                            if (value!.trim().isEmpty) return 'La PA Sistólica es obligatoria';
                             final systolic = int.tryParse(value.trim());
                             if (systolic == null) return 'Debe ser un número entero';
-                            if (systolic < 80 || systolic > 200) return 'Debe estar entre 80 y 200';
+                            if (systolic < 80 || systolic > 200) return 'Debe estar entre 80 y 200 mmHg';
                             return null;
                           },
                         ),
@@ -121,17 +109,17 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                         TextFormField(
                           controller: _diastolicController,
                           enabled: !_isSaving,
-                          decoration: const InputDecoration(labelText: 'Presión Diastólica', border: OutlineInputBorder(), suffixText: 'mmHg'),
+                          decoration: const InputDecoration(labelText: 'Presión Diastólica *', border: OutlineInputBorder(), suffixText: 'mmHg', helperText: "Valor inferior de la presión arterial"),
                           keyboardType: TextInputType.number,
                           validator: (value) {
-                            if (value!.trim().isEmpty) return 'Este campo es obligatorio';
+                            if (value!.trim().isEmpty) return 'La PA Diastólica es obligatoria';
                             final diastolic = int.tryParse(value.trim());
-                            if (diastolic == null) return 'Debe ser un número entero';
-                            if (diastolic < 50 || diastolic > 130) return 'Debe estar entre 50 y 130';
+                            if (diastolic == null) return 'Debe ingresar un número entero';
+                            if (diastolic < 50 || diastolic > 130) return 'Debe estar entre 50 y 130 mmHg';
 
                             final systolic = int.tryParse(_systolicController.text.trim());
                             if (systolic != null && diastolic >= systolic) {
-                              return 'La presión diastólica debe ser menor a la sistólica';
+                              return 'Debe ser menor a la presión sistólica';
                             }
                             
                             return null;
@@ -141,13 +129,13 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                         TextFormField(
                           controller: _heartRateController,
                           enabled: !_isSaving,
-                          decoration: const InputDecoration(labelText: 'Frecuencia Cardíaca', border: OutlineInputBorder(), suffixText: 'bpm'),
+                          decoration: const InputDecoration(labelText: 'Frecuencia Cardíaca *', border: OutlineInputBorder(), suffixText: 'bpm', helperText: "Latidos por minuto (Pulso)"),
                           keyboardType: TextInputType.number,
                           validator: (value) {
-                            if (value!.trim().isEmpty) return 'Este campo es obligatorio';
+                            if (value!.trim().isEmpty) return 'La Frecuencia Cardiaca es obligatoria';
                             final parsed = int.tryParse(value.trim());
                             if (parsed == null) return 'Debe ser un número entero';
-                            if (parsed < 40 || parsed > 200) return 'Debe estar entre 40 y 200';
+                            if (parsed < 40 || parsed > 200) return 'Debe estar entre 40 y 200 bpm';
                             return null;
                           },
                         ),
@@ -190,6 +178,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                       _temperatureController.text = '37';
                     },
                     icon: Icon(Icons.auto_fix_high_outlined),
+                    tooltip: 'Usar valor normal (37°C)',
                   ),
                 ],
               ),
@@ -227,6 +216,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                       _bloodSugarController.text = '4';
                     },
                     icon: Icon(Icons.auto_fix_high_outlined),
+                    tooltip: 'Usar valor normal (4 mmol/L)',
                   ),
                 ],
               ),
@@ -245,7 +235,7 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
                         TextFormField(
                           controller: _notesController,
                           enabled: !_isSaving,
-                          decoration: const InputDecoration(labelText: 'Comentarios', border: OutlineInputBorder(),),
+                          decoration: const InputDecoration(labelText: 'Comentarios adicionales', helperText: "Apunta observaciones o síntomas relevantes (máx. 500 caracteres)", border: OutlineInputBorder(),),
                           keyboardType: TextInputType.text,
                           maxLines: 3,
                           validator: (value) {
@@ -318,11 +308,23 @@ class _MeasurementDialogState extends State<MeasurementDialog> {
           ));
         }
       } else {
+        final missingSugar = _bloodSugarController.text.trim().isEmpty;
+        final missingTemp = _temperatureController.text.trim().isEmpty;
+        String missingMessage;
+
+        if (missingSugar && missingTemp) { missingMessage = 'la glucosa y temperatura';} 
+        else if (missingSugar) {missingMessage = 'el nivel de glucosa';} 
+        else if (missingTemp) {missingMessage = 'la temperatura';} 
+        else {missingMessage = 'Campos incompletos.';}
+
         messenger.clearSnackBars();
-        messenger.showSnackBar(SnackBar(
-          content: Text('Medición guardada sin cálculo de riesgo.'),
-          backgroundColor: Colors.blue,
-        ));
+        messenger.showSnackBar(
+          SnackBar(
+            // content: Text('Medición guardada sin cálculo de riesgo.'),
+            // content: Text('Medición guardada sin cálculo de riesgo.\nPuedes completar $missingMessage después para calcularlo.'),
+            content: Text('Medicion Guardada, completa $missingMessage en el historial para calcular el nivel de riesgo.'),
+          )
+        );
       }
 
       final measurement = MeasurementModel(
